@@ -1,0 +1,115 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--paper);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Dark walnut desk: grain lines over a warm gradient, lit by a desk lamp. */
+  background-color: var(--wood-900);
+  background-image:
+    radial-gradient(ellipse at 50% 20%, var(--lamp), transparent 60%),
+    repeating-linear-gradient(
+      93deg,
+      rgba(255, 255, 255, 0.015) 0 2px,
+      transparent 2px 9px,
+      rgba(0, 0, 0, 0.12) 9px 10px,
+      transparent 10px 23px
+    ),
+    linear-gradient(180deg, var(--wood-700), var(--wood-800) 55%, var(--wood-900));
+  background-attachment: fixed;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* Shared button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0.7em 1.4em;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-type);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--oxblood);
+  color: var(--paper);
+  box-shadow: 0 2px 0 #4d0f0f, 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.btn-primary:hover {
+  background: var(--oxblood-bright);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(239, 230, 210, 0.35);
+  color: var(--paper);
+}
+
+.btn-ghost:hover {
+  background: rgba(239, 230, 210, 0.08);
+}
+
+.btn-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-ink:hover {
+  background: #3a322c;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

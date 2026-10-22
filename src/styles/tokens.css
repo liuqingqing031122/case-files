@@ -1,0 +1,30 @@
+/* Design tokens for the desk-noir look. The game is dark by design, so these
+   are intentionally theme-independent. */
+:root {
+  --wood-900: #140f0c;
+  --wood-800: #1f1712;
+  --wood-700: #33251c;
+  --wood-500: #5a4030;
+
+  --paper: #efe6d2;
+  --paper-shade: #e0d3b5;
+  --manila: #d6bd85;
+  --manila-dark: #b89b5e;
+
+  --ink: #2a2420;
+  --ink-soft: #5c5047;
+  --ink-faint: #8a7d70;
+
+  --oxblood: #8b1e1e;
+  --oxblood-bright: #b02a2a;
+  --brass: #c9a35f;
+  --lamp: rgba(255, 214, 150, 0.16);
+
+  --font-type: 'Special Elite', 'Courier New', Courier, monospace;
+  --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius: 4px;
+  --shadow-paper: 0 1px 1px rgba(0, 0, 0, 0.25), 0 10px 30px rgba(0, 0, 0, 0.45);
+  --gutter: 16px;
+}
