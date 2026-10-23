@@ -1,8 +1,13 @@
 {
   "name": "case-files",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "A 1932 country-house murder mystery for the browser, built on a data-driven mystery engine.",
+  "license": "UNLICENSED",
   "type": "module",
+  "engines": {
+    "node": "^20.0.0 || >=22.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

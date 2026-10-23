@@ -3,3 +3,9 @@ dist/
 *.log
 .DS_Store
 .vite/
+coverage/
+.env
+.env.*
+*.local
+.vscode/
+.idea/

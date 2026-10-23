@@ -1,6 +1,9 @@
 # Ashgrove Manor: Solution Bible v2.2 (approved)
 
-> Source of truth for the case. `src/case/ashgrove.ts` must stay consistent with this document. **Contains spoilers.**
+> ## ⚠️ Full solution: play the game first
+> This document reveals the culprit, the complete timeline and every deduction in *The Ashgrove Manor Affair*. If you plan to play, stop reading here.
+
+> Source of truth for the case. `src/case/ashgrove.ts` must stay consistent with this document.
 
 ## v2.2 narrative changes (approved)
 Story, timeline, evidence relationships, contradictions and accusation rules are unchanged. Only explanations and wording changed:
