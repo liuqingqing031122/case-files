@@ -94,7 +94,7 @@ describe('accusationFeedback', () => {
     const fb = accusationFeedback(s.lastEvent.result, MAX, s.credibility);
     expect(fb.heading).toBe("It won't stand up");
     expect(fb.lines).toEqual([
-      "Motive: That shows what he'd lose, but why was he struck out?",
+      "Motive: That shows what he'd lose, but why was he cut out of the will?",
       'Physical Evidence: Nothing physical ties him to the poison.',
     ]);
   });

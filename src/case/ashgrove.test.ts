@@ -283,7 +283,7 @@ describe('failed accusations', () => {
   it('near-miss cards get Brandt’s tailored feedback', () => {
     const s = reduce(ashgrove, explored, accuse('theo', { ...proof, motive: 'E8' }));
     expect(s.lastEvent).toMatchObject({
-      result: { kind: 'unproven', messages: { motive: "That shows what he'd lose, but why was he struck out?" } },
+      result: { kind: 'unproven', messages: { motive: "That shows what he'd lose, but why was he cut out of the will?" } },
     });
   });
 
@@ -291,6 +291,36 @@ describe('failed accusations', () => {
     const s = reduce(ashgrove, initialState(ashgrove), accuse('theo', {}));
     expect(s.lastEvent).toMatchObject({ result: { kind: 'unproven', failedSlots: [...SLOT_IDS] } });
     expect(s.outcome).toBeNull();
+  });
+});
+
+describe('approved narrative rules (v2.2)', () => {
+  // All player-facing text except card titles (the "Bank Letter" title is
+  // where players are meant to make the B.L. connection themselves).
+  const textWithoutTitles = JSON.stringify({
+    ...ashgrove,
+    evidence: Object.values(ashgrove.evidence).map((e) => e.description),
+  });
+
+  it('"B.L." is never explained; players connect it to the Bank Letter themselves', () => {
+    expect(textWithoutTitles).not.toMatch(/Bank Letter|B\.L\. (means|stands|is short)/);
+    expect(ashgrove.evidence.E11.description.join(' ')).toContain('show him B.L.');
+  });
+
+  it('E14 explains the medicine in plain words but leaves "T.L." for the player', () => {
+    const e14 = ashgrove.evidence.E14.description.join(' ');
+    expect(e14).toContain('second bottle of digitalis');
+    expect(e14).not.toMatch(/Theo/);
+  });
+
+  it('Theo’s growing suspicion is supported in-game: he handles the post', () => {
+    const household = ashgrove.suspects.find((s) => s.id === 'pell')!.topics.find((t) => t.id === 'household')!;
+    expect(household.lines.join(' ')).toMatch(/sorts the post/);
+    expect(ashgrove.evidence.E12.description.join(' ')).toMatch(/Private.*enquiry/);
+  });
+
+  it('uses plain time words instead of "the three-quarters"', () => {
+    expect(textWithoutTitles).not.toMatch(/three-quarters/);
   });
 });
 
