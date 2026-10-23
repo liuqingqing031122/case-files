@@ -2,6 +2,7 @@ import { ashgrove } from './case/ashgrove';
 import GameHeader from './components/GameHeader';
 import Toasts from './components/Toasts';
 import { GameProvider, useGame } from './game/GameContext';
+import { formatSavedAt } from './game/save';
 import AccuseScreen from './screens/AccuseScreen';
 import CaseFileScreen from './screens/CaseFileScreen';
 import EndingScreen from './screens/EndingScreen';
@@ -22,17 +23,19 @@ export default function App() {
 }
 
 function Screens() {
-  const { data, state, view, go } = useGame();
+  const { data, view, go, saveInfo, canContinue, continueSolved, continueGame, startNewGame } = useGame();
 
   switch (view.name) {
-    case 'title': {
-      const started = state.examined.length > 0 || state.interviewed.length > 0;
+    case 'title':
       return (
         <TitleScreen
-          onEnter={() => go(state.outcome ? { name: 'ending' } : started ? { name: 'rooms' } : { name: 'intro' })}
+          mode={!canContinue ? 'fresh' : continueSolved ? 'solved' : 'inProgress'}
+          savedLabel={saveInfo.status === 'valid' && saveInfo.savedAt ? formatSavedAt(saveInfo.savedAt) : undefined}
+          unreadableSave={saveInfo.status === 'unreadable'}
+          onContinue={continueGame}
+          onNewGame={startNewGame}
         />
       );
-    }
     case 'intro':
       return (
         <IntroScreen

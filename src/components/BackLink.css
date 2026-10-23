@@ -3,10 +3,13 @@
   position: sticky;
   top: var(--header-h, 110px);
   z-index: 15;
-  margin: -24px calc(-1 * var(--gutter)) 12px;
-  padding: 4px var(--gutter);
-  background: rgba(20, 15, 12, 0.9);
-  border-bottom: 1px solid rgba(201, 163, 95, 0.18);
+  /* Spans exactly the content column, aligned with the room content below. */
+  margin: -24px 0 12px;
+  padding: 4px 8px;
+  background: rgba(20, 15, 12, 0.92);
+  border: 1px solid rgba(201, 163, 95, 0.18);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
   backdrop-filter: blur(4px);
 }
 
@@ -15,7 +18,6 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  margin-left: -4px;
   padding: 6px 12px 6px 4px;
   border: none;
   border-radius: var(--radius);

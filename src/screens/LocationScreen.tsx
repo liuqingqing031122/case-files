@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { findLocation, visibleHotspots, type HotspotDef } from '../engine';
 import BackLink from '../components/BackLink';
 import EvidenceCard from '../components/EvidenceCard';
@@ -9,7 +9,14 @@ import './LocationScreen.css';
 
 export default function LocationScreen({ locationId }: { locationId: string }) {
   const { data, state, act, go } = useGame();
-  const [note, setNote] = useState<HotspotDef | null>(null);
+  // The observation being shown. `seq` changes on every click, so clicking the
+  // same spot again replays the slip's entrance and brings it back into view.
+  const [note, setNote] = useState<{ spot: HotspotDef; seq: number } | null>(null);
+  const noteRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (note) noteRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [note]);
   const [openCard, setOpenCard] = useState<{ ids: string[]; isNew: boolean } | null>(null);
 
   const location = findLocation(data, locationId);
@@ -27,7 +34,7 @@ export default function LocationScreen({ locationId }: { locationId: string }) {
       const isNew = event.gained.length > 0;
       setOpenCard({ ids: isNew ? event.gained : spot.gives, isNew });
     } else {
-      setNote(spot);
+      setNote((prev) => ({ spot, seq: (prev?.seq ?? 0) + 1 }));
     }
   };
 
@@ -40,42 +47,45 @@ export default function LocationScreen({ locationId }: { locationId: string }) {
       <p className="page-kicker">Ashgrove Manor</p>
       <h1 className="page-title">{location.name}</h1>
 
-      <div className="scene">
-        {Scene && <Scene />}
-        {spots.map((spot) => {
-          const pos = HOTSPOT_POSITIONS[spot.id] ?? { x: 50, y: 50 };
-          return (
-            <button
-              key={spot.id}
-              className="hotspot"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-              onClick={() => inspect(spot)}
-              aria-label={`Inspect: ${spot.label}`}
-            >
-              <span className="hotspot-ring" aria-hidden="true" />
-              <span className="hotspot-label">{spot.label}</span>
+      <div className="scene-stage">
+        <div className="scene">
+          {Scene && <Scene />}
+          {spots.map((spot) => {
+            const pos = HOTSPOT_POSITIONS[spot.id] ?? { x: 50, y: 50 };
+            return (
+              <button
+                key={spot.id}
+                className={`hotspot${note?.spot.id === spot.id ? ' is-active' : ''}`}
+                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                onClick={() => inspect(spot)}
+                aria-label={`Inspect: ${spot.label}`}
+              >
+                <span className="hotspot-ring" aria-hidden="true" />
+                <span className="hotspot-label">{spot.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Observations appear on the scene (desktop) or right under it (mobile), next to the click. */}
+        {note && (
+          <aside key={note.seq} ref={noteRef} className="note-slip scene-note" aria-live="polite">
+            <p className="note-title">{note.spot.label}</p>
+            <p className="note-text">{note.spot.note}</p>
+            <button className="note-close" onClick={() => setNote(null)} aria-label="Dismiss note">
+              ×
             </button>
-          );
-        })}
+          </aside>
+        )}
       </div>
 
       <p className="room-hint">Tap a glowing point to look closer, or choose from the list below.</p>
-
-      {note && (
-        <aside className="note-slip" aria-live="polite">
-          <p className="note-title">{note.label}</p>
-          <p className="note-text">{note.note}</p>
-          <button className="note-close" onClick={() => setNote(null)} aria-label="Dismiss note">
-            ×
-          </button>
-        </aside>
-      )}
 
       <ul className="spot-list" aria-label={`Things to inspect in ${location.name}`}>
         {/* Deliberately no "examined" markers: players judge for themselves when a room is done. */}
         {spots.map((spot) => (
           <li key={spot.id}>
-            <button className="spot-item" onClick={() => inspect(spot)}>
+            <button className={`spot-item${note?.spot.id === spot.id ? ' is-active' : ''}`} onClick={() => inspect(spot)}>
               <span className="spot-check" aria-hidden="true">
                 ⌕
               </span>

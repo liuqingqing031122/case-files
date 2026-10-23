@@ -1,10 +1,13 @@
+import { useState } from 'react';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { SLOT_IDS } from '../engine';
 import { RATING_LABELS, SLOT_LABELS } from '../game/feedback';
 import { useGame } from '../game/GameContext';
 import './EndingScreen.css';
 
 export default function EndingScreen() {
-  const { data, state, go, newGame } = useGame();
+  const { data, state, go, startNewGame } = useGame();
+  const [confirming, setConfirming] = useState(false);
   const outcome = state.outcome;
   if (!outcome) return null;
   const { stats } = outcome;
@@ -64,16 +67,27 @@ export default function EndingScreen() {
             <dd>{state.failedAccusations}</dd>
           </div>
         </dl>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            newGame();
-            go({ name: 'title' });
-          }}
-        >
+        <button className="btn btn-primary" onClick={() => setConfirming(true)}>
           Play again
         </button>
+        <button className="btn btn-ghost" onClick={() => go({ name: 'title' })}>
+          Back to title
+        </button>
       </section>
+
+      {confirming && (
+        <ConfirmDialog
+          title="Play again?"
+          message="Your completed investigation will be replaced, and the case will start again from the beginning."
+          cancelLabel="Keep my result"
+          confirmLabel="Start a new investigation"
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            startNewGame();
+          }}
+        />
+      )}
     </main>
   );
 }

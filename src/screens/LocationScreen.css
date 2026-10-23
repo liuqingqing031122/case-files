@@ -1,3 +1,8 @@
+/* The scene plus its observation slip */
+.scene-stage {
+  position: relative;
+}
+
 /* Scene with overlaid hotspots */
 .scene {
   position: relative;
@@ -173,4 +178,46 @@
 
 .spot-check {
   color: var(--brass);
+}
+
+/* The hotspot the current observation belongs to (not a completion marker). */
+.hotspot.is-active .hotspot-ring {
+  animation: none;
+  background: rgba(244, 233, 168, 0.55);
+  border-color: #f4e9a8;
+  box-shadow: 0 0 0 4px rgba(244, 233, 168, 0.25);
+}
+
+.hotspot.is-active .hotspot-label {
+  opacity: 1;
+}
+
+.spot-item.is-active {
+  border-color: #f4e9a8;
+  background: rgba(244, 233, 168, 0.12);
+}
+
+/* Observation slip: on the scene's top-left corner on larger screens, where no
+   hotspot sits in any room; directly under the scene on phones. */
+.scene-note {
+  scroll-margin-top: calc(var(--header-h, 110px) + 64px);
+  scroll-margin-bottom: 16px;
+}
+
+@media (min-width: 641px) {
+  .scene-note {
+    position: absolute;
+    top: 22px;
+    left: 26px;
+    z-index: 5;
+    width: min(500px, calc(100% - 52px));
+    margin: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .scene-note {
+    margin: 12px 0 0;
+    max-width: none;
+  }
 }

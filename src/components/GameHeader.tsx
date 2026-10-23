@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { isReadyToAccuse, nextHint } from '../engine';
 import { useGame, type View } from '../game/GameContext';
 import './GameHeader.css';
@@ -15,6 +15,30 @@ export default function GameHeader() {
   const [hintOpen, setHintOpen] = useState(false);
   const ready = isReadyToAccuse(data, state);
   const headerRef = useRef<HTMLElement>(null);
+  const galeButtonRef = useRef<HTMLButtonElement>(null);
+  const hintPanelRef = useRef<HTMLElement>(null);
+
+  // Close Gale's note on Escape or on any press outside it. No overlay, so the
+  // press still reaches whatever was clicked. The Ask Gale button toggles itself.
+  useEffect(() => {
+    if (!hintOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (hintPanelRef.current?.contains(target) || galeButtonRef.current?.contains(target)) return;
+      setHintOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setHintOpen(false);
+      galeButtonRef.current?.focus();
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [hintOpen]);
 
   // Publish the header's height so sticky bars below it (BackLink) sit flush.
   useLayoutEffect(() => {
@@ -38,6 +62,7 @@ export default function GameHeader() {
         <div className="game-status">
           <Credibility value={state.credibility} max={data.startingCredibility} />
           <button
+            ref={galeButtonRef}
             className={`gale-button${hintOpen ? ' is-open' : ''}${galeOpened ? '' : ' is-new'}`}
             onClick={() => {
               setHintOpen((o) => !o);
@@ -77,7 +102,7 @@ export default function GameHeader() {
         })}
       </nav>
 
-      {hintOpen && <HintPanel onClose={() => setHintOpen(false)} />}
+      {hintOpen && <HintPanel panelRef={hintPanelRef} onClose={() => setHintOpen(false)} />}
     </header>
   );
 }
@@ -97,13 +122,13 @@ function Credibility({ value, max }: { value: number; max: number }) {
   );
 }
 
-function HintPanel({ onClose }: { onClose: () => void }) {
+function HintPanel({ onClose, panelRef }: { onClose: () => void; panelRef: RefObject<HTMLElement> }) {
   const { data, state, hintTiers, revealHintTier } = useGame();
   const hint = nextHint(data, state);
   const tier = hint ? (hintTiers[hint.id] ?? 1) : 0;
 
   return (
-    <aside className="hint-slip" aria-live="polite">
+    <aside ref={panelRef} className="hint-slip" aria-live="polite">
       <p className="hint-from">Inspector Gale · your partner on the case</p>
       <p className="hint-help">Gale gives hints, not answers. Ask for more if you need a clearer one.</p>
       {hint ? (
