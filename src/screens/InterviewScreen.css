@@ -132,15 +132,6 @@
   margin: 12px 0 0;
 }
 
-.section-heading {
-  margin: 0 0 10px;
-  font-family: var(--font-type);
-  font-size: 0.8rem;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(239, 230, 210, 0.65);
-}
 
 /* Statements, typed on a single sheet */
 .statement-list {
@@ -180,7 +171,7 @@
 
 .statement-press {
   flex: 0 0 auto;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0.5em 1em;
   font-size: 0.8rem;
 }
@@ -309,12 +300,6 @@
   color: var(--ink-soft);
 }
 
-.exchange-cred {
-  margin: 4px 0 0;
-  font-family: var(--font-type);
-  font-size: 0.85rem;
-  color: var(--oxblood);
-}
 
 .exchange-gained {
   display: flex;
@@ -329,7 +314,7 @@
 }
 
 .gained-chip {
-  min-height: 36px;
+  min-height: 44px;
   padding: 4px 12px;
   border: 1px solid var(--oxblood);
   border-radius: 2px;

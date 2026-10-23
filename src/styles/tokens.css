@@ -12,8 +12,8 @@
   --manila-dark: #b89b5e;
 
   --ink: #2a2420;
-  --ink-soft: #5c5047;
-  --ink-faint: #8a7d70;
+  --ink-soft: #544940; /* ≥4.5:1 on manila and paper */
+  --ink-faint: #6b6056; /* ≥4.5:1 on paper */
 
   --oxblood: #8b1e1e;
   --oxblood-bright: #b02a2a;

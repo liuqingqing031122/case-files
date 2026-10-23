@@ -20,8 +20,10 @@ export default function RoomsScreen() {
             <li key={location.id}>
               <button
                 className={`room-card${open ? '' : ' is-locked'}`}
+                // Locked rooms stay focusable so keyboard and screen-reader
+                // users can read how to unlock them; they just don't open.
                 onClick={() => open && go({ name: 'location', id: location.id })}
-                disabled={!open}
+                aria-disabled={!open}
               >
                 <span className="room-card-tab">{open ? 'Open' : 'Locked'}</span>
                 <span className="room-card-name">{location.name}</span>

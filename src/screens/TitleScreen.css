@@ -91,7 +91,7 @@
 
 .folder-meta dt {
   min-width: 80px;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   text-transform: uppercase;
   font-size: 0.78rem;
   letter-spacing: 0.1em;
@@ -153,7 +153,7 @@
   font-family: var(--font-type);
   font-size: 0.75rem;
   letter-spacing: 0.08em;
-  color: rgba(239, 230, 210, 0.45);
+  color: rgba(239, 230, 210, 0.66);
 }
 
 @keyframes folder-in {

@@ -70,8 +70,10 @@
   transition: transform 120ms ease, border-color 120ms ease;
 }
 
-.picker-card:hover {
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .picker-card:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .picker-card.is-testimony {

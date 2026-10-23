@@ -25,6 +25,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
+  min-height: 44px;
   padding: 4px 0;
   background: none;
   border: none;
@@ -192,7 +194,7 @@
   right: max(var(--gutter), calc((100% - 1040px) / 2));
   top: calc(100% + 8px);
   width: min(380px, calc(100% - 2 * var(--gutter)));
-  padding: 14px 40px 14px 18px;
+  padding: 14px 52px 14px 18px;
   background: #f4e9a8;
   color: var(--ink);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
@@ -310,7 +312,11 @@
 
   .game-brand {
     grid-area: brand;
-    padding-bottom: 0;
+    /* A 44px tap target that overlaps the credibility row instead of growing the header. */
+    min-height: 44px;
+    margin-bottom: -14px;
+    padding-bottom: 14px;
+    justify-content: flex-start;
   }
 
   .game-brand-kicker {

@@ -28,8 +28,10 @@
   transition: transform 140ms ease;
 }
 
-.room-card:hover:not(:disabled) {
-  transform: translateY(-3px) rotate(-0.4deg);
+@media (hover: hover) {
+  .room-card:hover:not(.is-locked) {
+    transform: translateY(-3px) rotate(-0.4deg);
+  }
 }
 
 .room-card-tab {
@@ -70,6 +72,7 @@
   color: var(--paper);
 }
 
+.room-card.is-locked .room-card-name,
 .room-card.is-locked .room-card-text {
-  color: #2a2420;
+  color: var(--paper);
 }

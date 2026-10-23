@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SLOT_IDS, isReadyToAccuse, type SlotId } from '../engine';
+import ConfirmDialog from '../components/ConfirmDialog';
 import EvidencePicker from '../components/EvidencePicker';
 import Portrait from '../components/Portrait';
 import { SLOT_LABELS, accusationFeedback, type Feedback } from '../game/feedback';
@@ -148,25 +149,18 @@ export default function AccuseScreen() {
       )}
 
       {confirming && suspect && (
-        <div className="evidence-backdrop" onClick={() => setConfirming(false)}>
-          <div className="confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title" onClick={(e) => e.stopPropagation()}>
-            <h2 id="confirm-title" className="confirm-title">
-              Accuse {suspect.name}?
-            </h2>
-            <p className="confirm-text">
-              Inspector Gale: “Once Mr. Brandt hears it, a weak case costs us credibility.
-              {filled < SLOT_IDS.length ? ` You've left ${SLOT_IDS.length - filled} part${SLOT_IDS.length - filled > 1 ? 's' : ''} of the case empty.` : ''} Are you sure?”
-            </p>
-            <div className="verdict-actions">
-              <button className="btn btn-ghost-ink" onClick={() => setConfirming(false)} autoFocus>
-                Not yet
-              </button>
-              <button className="btn btn-primary" onClick={submit}>
-                Present it
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={`Accuse ${suspect.name}?`}
+          message={`Inspector Gale: “Once Mr. Brandt hears it, a weak case costs us credibility.${
+            filled < SLOT_IDS.length
+              ? ` You've left ${SLOT_IDS.length - filled} part${SLOT_IDS.length - filled > 1 ? 's' : ''} of the case empty.`
+              : ''
+          } Are you sure?”`}
+          cancelLabel="Not yet"
+          confirmLabel="Present it"
+          onCancel={() => setConfirming(false)}
+          onConfirm={submit}
+        />
       )}
     </main>
   );

@@ -44,6 +44,29 @@ button {
   outline-offset: 3px;
 }
 
+/* Brass disappears on light paper, so controls inside paper and manila
+   surfaces get an oxblood ring instead (≥5:1 on both). Containers themselves
+   keep brass, because their outline is drawn on the dark desk. */
+:where(
+    .folder-body,
+    .memo,
+    .evidence-card,
+    .picker,
+    .confirm-dialog,
+    .statement-list,
+    [role='tabpanel'],
+    .accuse-slots,
+    .verdict,
+    .ending-sheet,
+    .hint-slip,
+    .note-slip,
+    .exchange,
+    .rating-slip
+  )
+  :focus-visible {
+  outline-color: var(--oxblood);
+}
+
 /* Shared button styles */
 .btn {
   display: inline-flex;
@@ -107,7 +130,7 @@ button {
 
 /* Small toggle buttons (filters) */
 .chip {
-  min-height: 36px;
+  min-height: 44px;
   padding: 4px 14px;
   border: 1px solid rgba(42, 36, 32, 0.3);
   border-radius: 18px;
@@ -159,7 +182,7 @@ button {
   position: relative;
   margin: 16px auto 0;
   max-width: 620px;
-  padding: 14px 44px 14px 18px;
+  padding: 14px 50px 14px 18px;
   background: #f4e9a8;
   color: var(--ink);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
@@ -184,10 +207,10 @@ button {
 
 .note-close {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 36px;
-  height: 36px;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   font-size: 1.4rem;
@@ -200,6 +223,25 @@ button {
     opacity: 0;
     transform: translateY(8px) rotate(-0.8deg);
   }
+}
+
+/* Small uppercase section label, used by several screens. */
+.section-heading {
+  margin: 0 0 10px;
+  font-family: var(--font-type);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(239, 230, 210, 0.65);
+}
+
+/* Credibility cost line, used in interview and accusation feedback. */
+.exchange-cred {
+  margin: 4px 0 0;
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  color: var(--oxblood);
 }
 
 .visually-hidden {

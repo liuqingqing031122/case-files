@@ -23,8 +23,10 @@
   transition: transform 140ms ease;
 }
 
-.suspect-card:hover {
-  transform: translateY(-3px) rotate(0.3deg);
+@media (hover: hover) {
+  .suspect-card:hover {
+    transform: translateY(-3px) rotate(0.3deg);
+  }
 }
 
 .portrait {

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { availableTopics, findSuspect, topicKey, type StatementDef } from '../engine';
 import BackLink from '../components/BackLink';
 import EvidenceCard from '../components/EvidenceCard';
 import EvidencePicker from '../components/EvidencePicker';
+import { scrollBehavior } from '../components/motion';
 import Portrait from '../components/Portrait';
 import { pressFeedback, topicFeedback, type Feedback } from '../game/feedback';
 import { useGame } from '../game/GameContext';
@@ -24,7 +25,7 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
 
   const exchange = exchanges[tab];
   useEffect(() => {
-    if (exchange) feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (exchange) feedbackRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
   }, [exchange]);
 
   if (!suspect) return null;
@@ -75,6 +76,22 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
     { id: 'topics', label: 'Ask about', count: available.length },
   ];
 
+  // Standard tabs keyboard pattern: arrows move between tabs, Home/End jump.
+  const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const ids = tabs.map((t) => t.id);
+    const current = ids.indexOf(tab);
+    const next =
+      e.key === 'ArrowRight' ? (current + 1) % ids.length
+      : e.key === 'ArrowLeft' ? (current - 1 + ids.length) % ids.length
+      : e.key === 'Home' ? 0
+      : e.key === 'End' ? ids.length - 1
+      : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    setTab(ids[next]);
+    document.getElementById(`tab-${ids[next]}`)?.focus();
+  };
+
   return (
     <main className="page">
       <BackLink label="Back to Suspects" onClick={() => go({ name: 'suspects' })} />
@@ -94,7 +111,7 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
         about a topic to learn more.
       </p>
 
-      <div className="interview-tabs" role="tablist" aria-label="Interview actions">
+      <div className="interview-tabs" role="tablist" aria-label="Interview actions" onKeyDown={onTabKey}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -102,6 +119,7 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
             role="tab"
             aria-selected={tab === t.id}
             aria-controls={`panel-${t.id}`}
+            tabIndex={tab === t.id ? 0 : -1}
             className={`interview-tab${tab === t.id ? ' is-active' : ''}`}
             onClick={() => setTab(t.id)}
           >

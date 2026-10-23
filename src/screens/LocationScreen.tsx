@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { findLocation, visibleHotspots, type HotspotDef } from '../engine';
 import BackLink from '../components/BackLink';
+import { scrollBehavior } from '../components/motion';
 import EvidenceCard from '../components/EvidenceCard';
 import { useGame } from '../game/GameContext';
 import { HOTSPOT_POSITIONS } from '../game/uiContent';
@@ -15,7 +16,7 @@ export default function LocationScreen({ locationId }: { locationId: string }) {
   const noteRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (note) noteRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (note) noteRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
   }, [note]);
   const [openCard, setOpenCard] = useState<{ ids: string[]; isNew: boolean } | null>(null);
 

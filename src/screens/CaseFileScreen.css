@@ -49,8 +49,10 @@
   transform: rotate(1deg);
 }
 
-.casefile-grid .casefile-card:hover {
-  transform: translateY(-4px) rotate(0deg);
+@media (hover: hover) {
+  .casefile-grid .casefile-card:hover {
+    transform: translateY(-4px) rotate(0deg);
+  }
 }
 
 .casefile-thumb svg {

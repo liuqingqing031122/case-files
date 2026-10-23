@@ -42,7 +42,10 @@ export default function EndingScreen() {
       </section>
 
       <section className="ending-result" aria-label="Your result">
-        <div className="rating-stamp">{RATING_LABELS[outcome.rating]}</div>
+        <div className="rating-slip">
+          <p className="rating-slip-label">Mr. Brandt's verdict</p>
+          <div className="rating-stamp">{RATING_LABELS[outcome.rating]}</div>
+        </div>
         <dl className="ending-stats">
           <div>
             <dt>Contradictions found</dt>
