@@ -27,7 +27,8 @@ export default function IntroScreen({ paragraphs, onContinue, onBack }: Props) {
           <p className="memo-sign">— R.G.</p>
           <p className="memo-ps">
             P.S. I'll be on hand throughout. If you get stuck, press <strong>Ask Gale</strong> at the top of the
-            screen and I'll suggest where to look next.
+            screen and I'll suggest where to look next. Mistakes may cost you credibility. They won't stop your
+            investigation, but they will affect your final rating.
           </p>
         </div>
 

@@ -7,6 +7,7 @@ import { scrollBehavior } from '../components/motion';
 import Portrait from '../components/Portrait';
 import { pressFeedback, topicFeedback, type Feedback } from '../game/feedback';
 import { useGame } from '../game/GameContext';
+import { newlyAvailableTopics } from '../game/announcements';
 import { INTERVIEW_STATUS_LABELS, interviewStatus } from '../game/interviewStatus';
 import { SUSPECT_INFO } from '../game/uiContent';
 import './InterviewScreen.css';
@@ -35,9 +36,14 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
 
   const present = (evidenceId: string) => {
     if (!pressing) return;
+    const before = state;
     const next = act({ type: 'press', suspectId, statementId: pressing.id, evidenceId });
     setPressing(null);
-    setExchanges((prev) => ({ ...prev, statements: pressFeedback(data, next.lastEvent, data.startingCredibility) }));
+    const opened = suspect ? newlyAvailableTopics(suspect, before, next) : [];
+    setExchanges((prev) => ({
+      ...prev,
+      statements: pressFeedback(data, next.lastEvent, data.startingCredibility, opened),
+    }));
   };
 
   const ask = (topicId: string, label: string) => {
@@ -58,6 +64,16 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
         </p>
       ))}
       {exchange.credibilityNote && <p className="exchange-cred">{exchange.credibilityNote}</p>}
+      {exchange.newTopics && exchange.newTopics.length > 0 && (
+        <div className="exchange-gained exchange-topics">
+          <span>New questions to ask:</span>
+          {exchange.newTopics.map((topic) => (
+            <button key={topic.id} className="gained-chip" onClick={() => setTab('topics')}>
+              {topic.label}
+            </button>
+          ))}
+        </div>
+      )}
       {exchange.gained.length > 0 && (
         <div className="exchange-gained">
           <span>Added to case file:</span>
@@ -108,7 +124,7 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
 
       <p className="interview-howto">
         <strong>Challenge</strong> a statement by presenting evidence that contradicts it, or <strong>ask</strong>{' '}
-        about a topic to learn more.
+        about a topic to learn more. A wrong challenge costs a little credibility.
       </p>
 
       <div className="interview-tabs" role="tablist" aria-label="Interview actions" onKeyDown={onTabKey}>

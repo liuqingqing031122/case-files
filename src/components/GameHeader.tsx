@@ -109,7 +109,12 @@ export default function GameHeader() {
 
 function Credibility({ value, max }: { value: number; max: number }) {
   return (
-    <div className="credibility" aria-label={`Credibility ${value} of ${max}`} title="Credibility">
+    <div
+      className="credibility"
+      role="img"
+      aria-label={`Credibility ${value} of ${max}. Mistakes lower it; it only affects your final rating.`}
+      title="Credibility: mistakes lower it. It only affects your final rating."
+    >
       <span className="credibility-label" aria-hidden="true">
         Credibility
       </span>

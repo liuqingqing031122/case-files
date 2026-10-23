@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ashgrove } from '../case/ashgrove';
 import { exploreAll, initialState, reduce, type GameAction, type GameState } from '../engine';
-import { RATING_LABELS, accusationFeedback, pressFeedback, topicFeedback } from './feedback';
+import { CHIEF_MAX_FAILED, MASTER_MIN_CREDIBILITY, rate } from '../engine/accusation';
+import { RATING_CRITERIA, RATING_LABELS, accusationFeedback, pressFeedback, topicFeedback } from './feedback';
+import { newlyAvailableTopics } from './announcements';
 
 const MAX = ashgrove.startingCredibility;
 const run = (actions: GameAction[], from: GameState = initialState(ashgrove)) =>
@@ -97,5 +99,46 @@ describe('accusationFeedback', () => {
       "Motive: That shows what he'd lose, but why was he cut out of the will?",
       'Physical Evidence: Nothing physical ties him to the poison.',
     ]);
+  });
+});
+
+describe('M7 feedback additions', () => {
+  it('a contradiction lists the topics it opened', () => {
+    const julian = ashgrove.suspects.find((x) => x.id === 'julian')!;
+    const s = reduce(ashgrove, atJulian, { type: 'press', suspectId: 'julian', statementId: 'study', evidenceId: 'E10' });
+    const fb = pressFeedback(ashgrove, s.lastEvent, MAX, newlyAvailableTopics(julian, atJulian, s))!;
+    expect(fb.newTopics?.map((t) => t.label)).toEqual(['The break-in']);
+  });
+
+  it('wrong presses never list topics', () => {
+    const s = reduce(ashgrove, atJulian, { type: 'press', suspectId: 'julian', statementId: 'study', evidenceId: 'E1' });
+    expect(pressFeedback(ashgrove, s.lastEvent, MAX)?.newTopics).toBeUndefined();
+  });
+
+  it('the rating criteria text matches the real rating rules', () => {
+    expect(RATING_CRITERIA).toContain(`credibility of ${MASTER_MIN_CREDIBILITY} or more`);
+    expect(RATING_CRITERIA).toContain(`no more than ${CHIEF_MAX_FAILED} failed accusation`);
+    expect(rate(0, MASTER_MIN_CREDIBILITY)).toBe('master');
+    expect(rate(CHIEF_MAX_FAILED, 5)).toBe('chief');
+    expect(rate(CHIEF_MAX_FAILED + 1, 5)).toBe('dogged');
+  });
+
+  it('E6 and E4 in the physical slot get tailored near-misses; accepted cards are unchanged', () => {
+    const explored = exploreAll(ashgrove);
+    const base = { motive: 'E12', means: 'E14', opportunity: 'T-C' };
+    const messages: Record<string, string> = {
+      E6: 'That bottle proves the poison was there, not who poured it.',
+      E4: 'The glass shows how he died, not who stood beside it.',
+    };
+    for (const [card, message] of Object.entries(messages)) {
+      const s = reduce(ashgrove, explored, { type: 'accuse', accusation: { suspectId: 'theo', slots: { ...base, physical: card } } });
+      expect(s.lastEvent).toMatchObject({ result: { kind: 'unproven', failedSlots: ['physical'], messages: { physical: message } } });
+    }
+    expect(ashgrove.accusation.slots.physical.accepts).toEqual(['E17']);
+  });
+
+  it('none of the new onboarding text names the culprit', () => {
+    const texts = [...ashgrove.story.intro, RATING_CRITERIA, ...Object.values(ashgrove.accusation.slots.physical.nearMisses ?? {})];
+    for (const t of texts) expect(t).not.toMatch(/Theo|Lyle|T\.L\./);
   });
 });

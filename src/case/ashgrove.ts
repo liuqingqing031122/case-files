@@ -492,7 +492,11 @@ export const ashgrove: CaseData = {
       physical: {
         accepts: ['E17'],
         failMessage: 'Nothing physical ties him to the poison.',
-        nearMisses: { E5: 'That tells us what the tincture looks like. Where have we seen it since?' },
+        nearMisses: {
+          E5: 'That tells us what the tincture looks like. Where have we seen it since?',
+          E6: 'That bottle proves the poison was there, not who poured it.',
+          E4: 'The glass shows how he died, not who stood beside it.',
+        },
       },
     },
     rebuttals: {
@@ -571,6 +575,7 @@ export const ashgrove: CaseData = {
     intro: [
       'Sir Edmund Ashgrove collapsed at his own dinner table last night and died before the doctor arrived. He was due to sign a new will at ten o’clock this morning.',
       'Dr. Harlow suspects poison. He locked the dining room and the study before anyone could tidy them. Nobody in the household has been told what he found.',
+      'Mr. Brandt, the family solicitor, arrives at ten. Before then, you must identify the killer and build a convincing case: why they did it, how they carried it out, when they had the opportunity, and what physical evidence connects them to the crime.',
       'Besides Sir Edmund, five people were in the house. At least one of them is lying to us. Start in the dining room.',
     ],
     readyLine: "I think we're ready, Detective. Whenever you are, Mr. Brandt will hear the case.",

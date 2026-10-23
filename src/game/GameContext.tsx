@@ -21,6 +21,7 @@ import {
   type GameAction,
   type GameState,
 } from '../engine';
+import { newlyRevealedHotspots, revealMessage } from './announcements';
 import { createSaveController, getStorage, hasProgress, resumeView, type SaveController, type SaveInfo } from './save';
 import { isResumeView, type ResumeView, type View } from './view';
 
@@ -124,6 +125,7 @@ export function GameProvider({ data, children, storage }: ProviderProps) {
       for (const loc of openLocations(data, next)) {
         if (!before.has(loc.id)) notify(`New location unlocked: ${loc.name}`, 'good');
       }
+      for (const revealed of newlyRevealedHotspots(data, prev, next)) notify(revealMessage(revealed), 'good');
       if (!isReadyToAccuse(data, prev) && isReadyToAccuse(data, next)) {
         notify(`Inspector Gale: “${data.story.readyLine}”`, 'good');
       }

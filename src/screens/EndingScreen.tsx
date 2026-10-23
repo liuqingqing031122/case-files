@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { SLOT_IDS } from '../engine';
-import { RATING_LABELS, SLOT_LABELS } from '../game/feedback';
+import { RATING_CRITERIA, RATING_LABELS, SLOT_LABELS } from '../game/feedback';
 import { useGame } from '../game/GameContext';
 import './EndingScreen.css';
 
@@ -46,6 +46,7 @@ export default function EndingScreen() {
           <p className="rating-slip-label">Mr. Brandt's verdict</p>
           <div className="rating-stamp">{RATING_LABELS[outcome.rating]}</div>
         </div>
+        <p className="rating-criteria">{RATING_CRITERIA}</p>
         <dl className="ending-stats">
           <div>
             <dt>Contradictions found</dt>
