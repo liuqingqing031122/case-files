@@ -71,6 +71,30 @@
   color: var(--oxblood);
 }
 
+.memo-body .memo-rating {
+  margin: 4px 0 6px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(42, 36, 32, 0.35);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.memo-rating p {
+  margin: 0 0 8px;
+}
+
+.memo-rating p:last-child {
+  margin-bottom: 0;
+}
+
+.memo-body .memo-rating .memo-rating-title {
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
 .memo-actions {
   display: flex;
   justify-content: space-between;

@@ -2,7 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { ashgrove } from '../case/ashgrove';
 import { exploreAll, initialState, reduce, type GameAction, type GameState } from '../engine';
 import { CHIEF_MAX_FAILED, MASTER_MIN_CREDIBILITY, rate } from '../engine/accusation';
-import { RATING_CRITERIA, RATING_LABELS, accusationFeedback, pressFeedback, topicFeedback } from './feedback';
+import {
+  ACCUSE_REMINDER,
+  RATING_CRITERIA,
+  RATING_EXPLANATION,
+  RATING_LABELS,
+  accusationFeedback,
+  credibilityChangeNote,
+  pressFeedback,
+  topicFeedback,
+} from './feedback';
 import { newlyAvailableTopics } from './announcements';
 
 const MAX = ashgrove.startingCredibility;
@@ -140,5 +149,82 @@ describe('M7 feedback additions', () => {
   it('none of the new onboarding text names the culprit', () => {
     const texts = [...ashgrove.story.intro, RATING_CRITERIA, ...Object.values(ashgrove.accusation.slots.physical.nearMisses ?? {})];
     for (const t of texts) expect(t).not.toMatch(/Theo|Lyle|T\.L\./);
+  });
+});
+
+describe('credibility explanations', () => {
+  it('the briefing explains the final rating and that 0 credibility never blocks the case', () => {
+    const text = RATING_EXPLANATION.lines.join(' ');
+    expect(RATING_EXPLANATION.title).toBe('Detective Rating');
+    expect(text).toMatch(/rated when you solve the case/);
+    expect(text).toMatch(/Incorrect testimony challenges and failed accusations reduce your credibility/);
+    expect(text).toMatch(/reaching 0 will never prevent you from solving the case/);
+    expect(text).toMatch(/retry accusations as often as you need/);
+  });
+
+  it('the briefing does not reveal rating thresholds', () => {
+    const text = RATING_EXPLANATION.lines.join(' ');
+    for (const label of Object.values(RATING_LABELS)) expect(text).not.toContain(label);
+    expect(text).not.toMatch(/\b4\b|first attempt|no more than/);
+  });
+
+  it('the Accuse screen reminder explains the consequence and that retries are allowed', () => {
+    expect(ACCUSE_REMINDER).toBe(
+      'Failed accusations lower your credibility and may affect your final rating, but you can always try again.',
+    );
+  });
+});
+
+describe('credibilityChangeNote', () => {
+  it('a normal drop keeps the existing wording', () => {
+    expect(credibilityChangeNote(3, 2, 5)).toBe('Credibility −1 (2/5)');
+    expect(credibilityChangeNote(5, 4, 5, '. The case stays open.')).toBe('Credibility −1 (4/5). The case stays open.');
+  });
+
+  it('dropping from 1 to 0 explains the consequence once', () => {
+    expect(credibilityChangeNote(1, 0, 5)).toBe(
+      'Credibility −1 (0/5). Your credibility is exhausted, but the investigation remains open. You can continue investigating and making accusations. Credibility only affects your final rating.',
+    );
+  });
+
+  it('already at 0: no false "−1", and the long explanation is not repeated', () => {
+    const note = credibilityChangeNote(0, 0, 5, '. The case stays open.');
+    expect(note).toBe('Credibility remains at 0/5. The investigation is still open.');
+    expect(note).not.toContain('−1');
+    expect(note).not.toContain('exhausted');
+  });
+});
+
+describe('credibility feedback in play', () => {
+  const wrongPress = { type: 'press', suspectId: 'julian', statementId: 'study', evidenceId: 'E1' } as const;
+
+  it('incorrect challenges: 1 → 0 explains, then 0 → 0 says it remains', () => {
+    let s = run(Array(4).fill(wrongPress), atJulian);
+    expect(s.credibility).toBe(1);
+    const before = s.credibility;
+    s = reduce(ashgrove, s, wrongPress);
+    expect(pressFeedback(ashgrove, s.lastEvent, MAX, [], before)?.credibilityNote).toMatch(/^Credibility −1 \(0\/5\)\. Your credibility is exhausted/);
+    const again = reduce(ashgrove, s, wrongPress);
+    expect(again.credibility).toBe(0);
+    expect(pressFeedback(ashgrove, again.lastEvent, MAX, [], s.credibility)?.credibilityNote).toBe(
+      'Credibility remains at 0/5. The investigation is still open.',
+    );
+  });
+
+  it('failed accusations: 1 → 0 explains, then every later failure says it remains', () => {
+    const explored = exploreAll(ashgrove);
+    const wrong = { type: 'accuse', accusation: { suspectId: 'pell', slots: {} } } as const;
+    let s = run(Array(4).fill(wrong), explored);
+    expect(s.credibility).toBe(1);
+    for (let i = 0; i < 4; i++) {
+      const before = s.credibility;
+      s = reduce(ashgrove, s, wrong);
+      if (s.lastEvent.kind !== 'accusation') throw new Error('expected an accusation');
+      const note = accusationFeedback(s.lastEvent.result, MAX, s.credibility, before).credibilityNote!;
+      if (i === 0) expect(note).toMatch(/^Credibility −1 \(0\/5\)\. Your credibility is exhausted/);
+      else expect(note).toBe('Credibility remains at 0/5. The investigation is still open.');
+    }
+    expect(s.failedAccusations).toBe(8);
+    expect(s.outcome).toBeNull();
   });
 });

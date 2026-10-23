@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useFocusOnMount } from '../components/useFocusOnMount';
 import './TitleScreen.css';
 
 export type TitleMode = 'fresh' | 'inProgress' | 'solved';
@@ -19,6 +20,7 @@ const STATUS: Record<TitleMode, string> = { fresh: 'Unsolved', inProgress: 'In p
 
 export default function TitleScreen({ mode, savedLabel, unreadableSave, onContinue, onNewGame }: Props) {
   const [confirming, setConfirming] = useState(false);
+  const primaryRef = useFocusOnMount<HTMLButtonElement>();
   const hasGame = mode !== 'fresh';
 
   return (
@@ -60,7 +62,7 @@ export default function TitleScreen({ mode, savedLabel, unreadableSave, onContin
           <div className="folder-actions">
             {hasGame ? (
               <>
-                <button className="btn btn-primary" onClick={onContinue} autoFocus>
+                <button ref={primaryRef} className="btn btn-primary" onClick={onContinue}>
                   {mode === 'solved' ? 'View Result' : 'Continue Investigation'}
                 </button>
                 <button className="btn btn-ghost-ink" onClick={() => setConfirming(true)}>
@@ -68,7 +70,7 @@ export default function TitleScreen({ mode, savedLabel, unreadableSave, onContin
                 </button>
               </>
             ) : (
-              <button className="btn btn-primary" onClick={onNewGame} autoFocus>
+              <button ref={primaryRef} className="btn btn-primary" onClick={onNewGame}>
                 Enter the Manor
               </button>
             )}

@@ -3,7 +3,7 @@ import { SLOT_IDS, isReadyToAccuse, type SlotId } from '../engine';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EvidencePicker from '../components/EvidencePicker';
 import Portrait from '../components/Portrait';
-import { SLOT_LABELS, accusationFeedback, type Feedback } from '../game/feedback';
+import { ACCUSE_REMINDER, SLOT_LABELS, accusationFeedback, type Feedback } from '../game/feedback';
 import { useGame } from '../game/GameContext';
 import './AccuseScreen.css';
 
@@ -22,6 +22,7 @@ export default function AccuseScreen() {
   const submit = () => {
     if (!suspectId) return;
     setConfirming(false);
+    const credibilityBefore = state.credibility;
     const next = act({ type: 'accuse', accusation: { suspectId, slots } });
     const event = next.lastEvent;
     if (event.kind !== 'accusation') return;
@@ -29,13 +30,13 @@ export default function AccuseScreen() {
       go({ name: 'ending' });
       return;
     }
-    setVerdict(accusationFeedback(event.result, data.startingCredibility, next.credibility));
+    setVerdict(accusationFeedback(event.result, data.startingCredibility, next.credibility, credibilityBefore));
   };
 
   if (verdict) {
     return (
       <main className="page">
-        <p className="page-kicker">Mr. Brandt's verdict</p>
+        <p className="page-kicker">Mr. Brandt's Verdict · Accusation {state.failedAccusations}</p>
         <h1 className="page-title">{verdict.heading}</h1>
         <section className="verdict" aria-live="polite">
           {verdict.lines.map((line) => (
@@ -65,6 +66,7 @@ export default function AccuseScreen() {
         Naming the culprit is not enough. Support each part of the case with one card from your file.
         {isReadyToAccuse(data, state) ? ' Inspector Gale thinks you are ready.' : ''}
       </p>
+      <p className="accuse-reminder">{ACCUSE_REMINDER}</p>
 
       <section aria-labelledby="accuse-who">
         <h2 id="accuse-who" className="section-heading">

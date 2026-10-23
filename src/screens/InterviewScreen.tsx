@@ -42,7 +42,7 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
     const opened = suspect ? newlyAvailableTopics(suspect, before, next) : [];
     setExchanges((prev) => ({
       ...prev,
-      statements: pressFeedback(data, next.lastEvent, data.startingCredibility, opened),
+      statements: pressFeedback(data, next.lastEvent, data.startingCredibility, opened, before.credibility),
     }));
   };
 

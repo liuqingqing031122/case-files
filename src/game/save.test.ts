@@ -112,6 +112,18 @@ describe('save format', () => {
     expect(reduce(ashgrove, result.save.state, proof).outcome?.kind).toBe('proven');
   });
 
+  it('many failed accusations at 0 credibility survive a reload, and the case can still be proven', () => {
+    const wrong: GameAction = { type: 'accuse', accusation: { suspectId: 'pell', slots: {} } };
+    const battered = play(Array(7).fill(wrong), midGame);
+    expect(battered.failedAccusations).toBe(7);
+    expect(battered.credibility).toBe(0);
+    const result = parseSave(ashgrove, JSON.stringify(serializeSave(ashgrove, battered, ui)));
+    if (result.status !== 'valid') throw new Error('expected valid');
+    expect(result.save.state).toEqual({ ...battered, lastEvent: { kind: 'none' } });
+    expect(resumeView(ashgrove, result.save.state, { name: 'accuse' })).toEqual({ name: 'accuse' });
+    expect(reduce(ashgrove, result.save.state, proof).outcome).toMatchObject({ kind: 'proven', rating: 'dogged' });
+  });
+
   it('a solved case round-trips its outcome', () => {
     const solved = reduce(ashgrove, midGame, proof);
     const result = parseSave(ashgrove, JSON.stringify(serializeSave(ashgrove, solved, ui)));

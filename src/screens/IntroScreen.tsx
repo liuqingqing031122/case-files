@@ -1,3 +1,5 @@
+import { useFocusOnMount } from '../components/useFocusOnMount';
+import { RATING_EXPLANATION } from '../game/feedback';
 import './IntroScreen.css';
 
 interface Props {
@@ -7,6 +9,8 @@ interface Props {
 }
 
 export default function IntroScreen({ paragraphs, onContinue, onBack }: Props) {
+  // Keyboard users land on "Step Inside", but the briefing still opens at the top.
+  const continueRef = useFocusOnMount<HTMLButtonElement>();
   return (
     <main className="intro-screen">
       <article className="memo" aria-labelledby="memo-title">
@@ -27,16 +31,23 @@ export default function IntroScreen({ paragraphs, onContinue, onBack }: Props) {
           <p className="memo-sign">— R.G.</p>
           <p className="memo-ps">
             P.S. I'll be on hand throughout. If you get stuck, press <strong>Ask Gale</strong> at the top of the
-            screen and I'll suggest where to look next. Mistakes may cost you credibility. They won't stop your
-            investigation, but they will affect your final rating.
+            screen and I'll suggest where to look next.
           </p>
+          <section className="memo-rating" aria-labelledby="memo-rating-title">
+            <p id="memo-rating-title" className="memo-rating-title">
+              {RATING_EXPLANATION.title}
+            </p>
+            {RATING_EXPLANATION.lines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </section>
         </div>
 
         <footer className="memo-actions">
           <button className="btn btn-ghost-ink" onClick={onBack}>
             Back
           </button>
-          <button className="btn btn-primary" onClick={onContinue} autoFocus>
+          <button ref={continueRef} className="btn btn-primary" onClick={onContinue}>
             Step Inside
           </button>
         </footer>

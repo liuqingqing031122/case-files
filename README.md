@@ -4,7 +4,9 @@ _A 1932 country-house murder mystery for the browser. Search the manor, question
 
 ![The Case Files title screen: a manila case folder on a dark wooden desk](.github/readme/title.jpg)
 
-**Live demo:** coming soon
+### ▶ [Play Case Files in your browser](https://case-files-ruby.vercel.app/)
+
+Free to play on desktop and mobile. No sign-up or download. Progress saves automatically.
 
 ## About the game
 
@@ -119,8 +121,7 @@ The build uses relative asset paths, so `dist/` works on any static host, includ
 
 ## Project status
 
-The game is complete and playable. Not yet available:
-- **Live demo:** pending deployment.
+The game is complete and live at **[case-files-ruby.vercel.app](https://case-files-ruby.vercel.app/)**, deployed on Vercel from this repository. Not yet available:
 - **More cases:** the engine supports them, but there is only one case and no case selection.
 - **Language and sound:** English only, no audio.
 - **Cloud saves:** progress is stored in one browser on one device.

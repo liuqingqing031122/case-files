@@ -35,12 +35,47 @@ export const RATING_CRITERIA = `${RATING_LABELS.master}: proven at the first att
 
 const cards = (data: CaseData, ids: string[]) => ids.map((id) => data.evidence[id]).filter(Boolean);
 
+// --- Credibility wording ----------------------------------------------------
+// Credibility only affects the final rating; it never blocks the investigation.
+
+/** The briefing's note on how the investigation is rated (no thresholds). */
+export const RATING_EXPLANATION = {
+  title: 'Detective Rating',
+  lines: [
+    'Your investigation will be rated when you solve the case. Incorrect testimony challenges and failed accusations reduce your credibility, which may affect your final rating.',
+    'Credibility starts at 5/5, but reaching 0 will never prevent you from solving the case. You can retry accusations as often as you need.',
+  ],
+};
+
+/** Shown on the Accuse screen. */
+export const ACCUSE_REMINDER =
+  'Failed accusations lower your credibility and may affect your final rating, but you can always try again.';
+
+/**
+ * The credibility line after a mistake, chosen from the value before and after
+ * it: a normal drop, the first time it reaches 0, or already at 0.
+ */
+export function credibilityChangeNote(
+  before: number,
+  after: number,
+  max: number,
+  normalSuffix = '',
+): string {
+  if (before <= 0 && after <= 0) return `Credibility remains at 0/${max}. The investigation is still open.`;
+  if (after === 0) {
+    return `Credibility −1 (0/${max}). Your credibility is exhausted, but the investigation remains open. You can continue investigating and making accusations. Credibility only affects your final rating.`;
+  }
+  return `Credibility −1 (${after}/${max})${normalSuffix}`;
+}
+
 /** Feedback for presenting evidence against a statement. */
 export function pressFeedback(
   data: CaseData,
   event: GameEvent,
   maxCredibility: number,
   newTopics: TopicDef[] = [],
+  /** Credibility before the press; defaults to "one point higher" (a normal drop). */
+  previousCredibility?: number,
 ): Feedback | null {
   switch (event.kind) {
     case 'contradiction':
@@ -57,7 +92,11 @@ export function pressFeedback(
         heading: "That doesn't contradict it",
         lines: [event.response],
         gained: [],
-        credibilityNote: `Credibility −1 (${event.credibility}/${maxCredibility})`,
+        credibilityNote: credibilityChangeNote(
+          previousCredibility ?? event.credibility + 1,
+          event.credibility,
+          maxCredibility,
+        ),
       };
     case 'alreadyBroken':
       return {
@@ -80,8 +119,14 @@ export function topicFeedback(data: CaseData, event: GameEvent, label: string): 
 }
 
 /** Feedback for a failed or successful accusation. */
-export function accusationFeedback(result: AccusationResult, maxCredibility: number, credibility: number): Feedback {
-  const credibilityNote = `Credibility −1 (${credibility}/${maxCredibility}). The case stays open.`;
+export function accusationFeedback(
+  result: AccusationResult,
+  maxCredibility: number,
+  credibility: number,
+  /** Credibility before the accusation; defaults to "one point higher" (a normal drop). */
+  previousCredibility: number = credibility + 1,
+): Feedback {
+  const credibilityNote = credibilityChangeNote(previousCredibility, credibility, maxCredibility, '. The case stays open.');
   switch (result.kind) {
     case 'wrongCulprit':
       return {

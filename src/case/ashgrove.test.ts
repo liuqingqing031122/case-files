@@ -253,6 +253,17 @@ describe('proving the case', () => {
     expect(nextHint(ashgrove, noLaundry)?.id).toBe('laundry');
   });
 
+  it('unlimited failed accusations never block a solution, even at 0 credibility', () => {
+    const wrong = accuse('pell', {});
+    const s = play([...criticalPath, ...Array(9).fill(wrong)]);
+    expect(s.failedAccusations).toBe(9);
+    expect(s.credibility).toBe(0);
+    expect(s.outcome).toBeNull();
+    const proven = play([accuse('theo', proof)], s);
+    expect(proven.outcome).toMatchObject({ kind: 'proven', rating: 'dogged' });
+    expect(proven.credibility).toBe(0);
+  });
+
   it('wrong presses never block a solution', () => {
     const wrong = Array(10).fill(press('theo', 'alibi', 'E1'));
     const s = play([interview('theo'), ...wrong, ...criticalPath, accuse('theo', proof)]);
