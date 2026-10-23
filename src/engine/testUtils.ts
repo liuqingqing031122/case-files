@@ -11,7 +11,7 @@ export function play(actions: GameAction[], data: CaseData = miniCase, from?: Ga
 export const fullInvestigation: GameAction[] = [
   { type: 'examine', locationId: 'hall', hotspotId: 'coatStand' },
   { type: 'examine', locationId: 'hall', hotspotId: 'desk' },
-  { type: 'openInterview', suspectId: 'maid' },
+  { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
   { type: 'examine', locationId: 'pantry', hotspotId: 'shelf' },
   { type: 'examine', locationId: 'pantry', hotspotId: 'backDoor' },
   { type: 'press', suspectId: 'maid', statementId: 'alibi', evidenceId: 'receipt' },

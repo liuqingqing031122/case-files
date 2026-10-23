@@ -69,20 +69,9 @@ export function reduce(data: CaseData, state: GameState, action: GameAction): Ga
       };
     }
 
-    case 'openInterview': {
-      const suspect = findSuspect(data, action.suspectId);
-      if (!suspect) return reject(state, 'Unknown suspect.');
-      const firstTime = !state.interviewed.includes(suspect.id);
-      return {
-        ...state,
-        interviewed: addUnique(state.interviewed, [suspect.id]),
-        lastEvent: { kind: 'interviewOpened', suspectId: suspect.id, firstTime },
-      };
-    }
-
     case 'askTopic': {
       const suspect = findSuspect(data, action.suspectId);
-      if (!suspect || !state.interviewed.includes(suspect.id)) return reject(state, 'Open the interview first.');
+      if (!suspect) return reject(state, 'Unknown suspect.');
       const topic = findTopic(suspect, action.topicId);
       if (!topic || !isMet(topic.requires, state)) return reject(state, 'That topic is not available.');
 
@@ -90,6 +79,7 @@ export function reduce(data: CaseData, state: GameState, action: GameAction): Ga
       return {
         ...state,
         evidence,
+        interviewed: addUnique(state.interviewed, [suspect.id]),
         topicsHeard: addUnique(state.topicsHeard, [topicKey(suspect.id, topic.id)]),
         lastEvent: { kind: 'topic', suspectId: suspect.id, topicId: topic.id, lines: topic.lines, gained },
       };
@@ -97,10 +87,13 @@ export function reduce(data: CaseData, state: GameState, action: GameAction): Ga
 
     case 'press': {
       const suspect = findSuspect(data, action.suspectId);
-      if (!suspect || !state.interviewed.includes(suspect.id)) return reject(state, 'Open the interview first.');
+      if (!suspect) return reject(state, 'Unknown suspect.');
       const statement = findStatement(suspect, action.statementId);
       if (!statement) return reject(state, 'Unknown statement.');
       if (!hasEvidence(state, action.evidenceId)) return reject(state, 'You do not hold that card.');
+
+      // Any genuine attempt to press counts as interviewing the suspect.
+      state = { ...state, interviewed: addUnique(state.interviewed, [suspect.id]) };
 
       const contradiction = statement.contradiction;
       if (contradiction && state.contradictions.includes(contradiction.id)) {

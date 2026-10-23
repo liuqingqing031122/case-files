@@ -1,0 +1,100 @@
+.casefile-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.chip-dark {
+  border-color: rgba(239, 230, 210, 0.3);
+  color: var(--paper);
+}
+
+.chip-dark.is-active {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.casefile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.casefile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 8px 8px 12px;
+  text-align: left;
+  border: none;
+  background: #faf7ef;
+  color: var(--ink);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform 140ms ease;
+}
+
+.casefile-grid li:nth-child(odd) .casefile-card {
+  transform: rotate(-1.2deg);
+}
+
+.casefile-grid li:nth-child(even) .casefile-card {
+  transform: rotate(1deg);
+}
+
+.casefile-grid .casefile-card:hover {
+  transform: translateY(-4px) rotate(0deg);
+}
+
+.casefile-thumb svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.casefile-card.is-testimony {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 23px, rgba(90, 120, 160, 0.14) 23px 24px),
+    var(--paper);
+}
+
+.casefile-quote {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  aspect-ratio: 1;
+  padding: 8px 6px 0 10px;
+  border-left: 3px solid var(--oxblood);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.casefile-id {
+  margin-top: 6px;
+  font-family: var(--font-type);
+  font-size: 0.72rem;
+  color: var(--oxblood);
+}
+
+.casefile-name {
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+@media (max-width: 420px) {
+  .casefile-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}

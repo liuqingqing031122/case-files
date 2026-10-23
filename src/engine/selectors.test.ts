@@ -53,7 +53,7 @@ describe('visibility selectors', () => {
     expect(visibleHotspots(hall, withState({ evidence: ['glove'] })).map((h) => h.id)).toContain('desk');
 
     const cook = miniCase.suspects[2];
-    expect(availableTopics(cook, base)).toEqual([]);
-    expect(availableTopics(cook, withState({ evidence: ['receipt'] })).map((t) => t.id)).toEqual(['shopping']);
+    expect(availableTopics(cook, base).map((t) => t.id)).toEqual(['kitchen']);
+    expect(availableTopics(cook, withState({ evidence: ['receipt'] })).map((t) => t.id)).toEqual(['kitchen', 'shopping']);
   });
 });

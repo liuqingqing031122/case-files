@@ -4,3 +4,4 @@ export * from './selectors';
 export { initialState, reduce } from './state';
 export { caseStats, evaluateAccusation, rate } from './accusation';
 export { validateCase } from './validate';
+export { exploreAll } from './solvability';

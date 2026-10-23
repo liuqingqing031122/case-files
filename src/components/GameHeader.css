@@ -1,0 +1,333 @@
+.game-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 10px var(--gutter) 0;
+  background: linear-gradient(180deg, rgba(20, 15, 12, 0.97), rgba(20, 15, 12, 0.92));
+  border-bottom: 1px solid rgba(201, 163, 95, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+.game-header-row,
+.game-nav {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+}
+
+.game-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.game-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.game-brand-kicker {
+  font-family: var(--font-type);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(239, 230, 210, 0.55);
+}
+
+.game-brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--paper);
+}
+
+.game-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.credibility {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.credibility-label {
+  font-family: var(--font-type);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(239, 230, 210, 0.55);
+}
+
+.credibility-pips {
+  display: flex;
+  gap: 4px;
+}
+
+.pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brass);
+  transition: background-color 200ms ease;
+}
+
+.pip.is-full {
+  background: var(--brass);
+}
+
+.gale-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px 14px;
+  border: 1px solid rgba(244, 233, 168, 0.5);
+  border-radius: var(--radius);
+  background: transparent;
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  color: #f4e9a8;
+  cursor: pointer;
+}
+
+.gale-button-kicker,
+.gale-button-label {
+  white-space: nowrap;
+}
+
+.gale-button-kicker {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 233, 168, 0.7);
+}
+
+.gale-button-label {
+  font-size: 0.9rem;
+}
+
+/* A gentle glow until the player has tried Gale once. */
+.gale-button.is-new {
+  animation: gale-glow 2.4s ease-in-out infinite;
+}
+
+.gale-button:hover,
+.gale-button.is-open {
+  background: rgba(244, 233, 168, 0.12);
+}
+
+.game-nav {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.game-tab {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  font-family: var(--font-type);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(239, 230, 210, 0.7);
+  cursor: pointer;
+}
+
+.game-tab:hover {
+  color: var(--paper);
+}
+
+.game-tab.is-active {
+  color: var(--paper);
+  border-bottom-color: var(--oxblood-bright);
+}
+
+.game-tab.is-ready {
+  color: #f4e9a8;
+}
+
+.game-tab-count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--oxblood);
+  font-size: 0.72rem;
+  color: var(--paper);
+  text-align: center;
+}
+
+.ready-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f4e9a8;
+  box-shadow: 0 0 0 0 rgba(244, 233, 168, 0.6);
+  animation: ready-pulse 1.8s ease-out infinite;
+}
+
+/* Gale's hint: a yellow note pinned under the header */
+.hint-slip {
+  position: absolute;
+  right: max(var(--gutter), calc((100% - 1040px) / 2));
+  top: calc(100% + 8px);
+  width: min(380px, calc(100% - 2 * var(--gutter)));
+  padding: 14px 40px 14px 18px;
+  background: #f4e9a8;
+  color: var(--ink);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  transform: rotate(0.6deg);
+  animation: slip-in 200ms ease both;
+}
+
+.hint-from {
+  margin: 0 0 6px;
+  font-family: var(--font-type);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hint-help {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(42, 36, 32, 0.3);
+  font-family: var(--font-type);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.hint-line {
+  margin: 0 0 8px;
+  font-family: var(--font-type);
+  line-height: 1.55;
+}
+
+.hint-more {
+  margin-top: 2px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  color: var(--oxblood);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@keyframes gale-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 233, 168, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(244, 233, 168, 0.22);
+  }
+}
+
+@keyframes ready-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 233, 168, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(244, 233, 168, 0);
+  }
+}
+
+@media (max-width: 520px) {
+  .credibility-label {
+    display: none;
+  }
+
+  .game-status {
+    gap: 10px;
+  }
+
+  .gale-button {
+    padding: 4px 10px;
+  }
+
+  .game-tab {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+}
+
+/* Narrow phones: all four tabs always fit, so Accuse is never hidden. */
+@media (max-width: 400px) {
+  .game-nav {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .game-tab {
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 0.74rem;
+    letter-spacing: 0.03em;
+  }
+
+  .tab-long {
+    display: none;
+  }
+
+  /* Credibility moves under the title; Ask Gale keeps the right-hand side. */
+  .game-header-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'brand gale'
+      'cred gale';
+    row-gap: 2px;
+  }
+
+  .game-status {
+    display: contents;
+  }
+
+  .game-brand {
+    grid-area: brand;
+    padding-bottom: 0;
+  }
+
+  .game-brand-kicker {
+    display: none;
+  }
+
+  .game-brand-title {
+    white-space: nowrap;
+  }
+
+  .credibility {
+    grid-area: cred;
+    align-items: flex-start;
+  }
+
+  .gale-button {
+    grid-area: gale;
+    align-self: center;
+  }
+}

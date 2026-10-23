@@ -20,8 +20,9 @@ export function caseStats(data: CaseData, state: GameState): CaseStats {
   const innocents = data.suspects.filter(
     (s) => s.id !== data.accusation.culpritId && s.statements.some((st) => st.contradiction),
   );
-  // An innocent is "cleared" once every one of their lies has been exposed.
-  const cleared = innocents.filter((s) =>
+  // An innocent's secret is "uncovered" once every one of their lies has been
+  // exposed. This is not proof of innocence (bible §8).
+  const uncovered = innocents.filter((s) =>
     s.statements.every(
       (st) => !st.contradiction || state.contradictions.includes(st.contradiction.id),
     ),
@@ -29,8 +30,8 @@ export function caseStats(data: CaseData, state: GameState): CaseStats {
   return {
     contradictionsFound: all.filter((c) => state.contradictions.includes(c.contradiction.id)).length,
     contradictionsTotal: all.length,
-    innocentsCleared: cleared.length,
-    innocentsTotal: innocents.length,
+    secretsUncovered: uncovered.length,
+    secretsTotal: innocents.length,
   };
 }
 

@@ -1,106 +1,7 @@
-import { useState } from 'react';
-import EvidenceCard from '../components/EvidenceCard';
-import { diningRoomHotspots, evidence, type SampleHotspot } from '../prototype/sampleData';
-import './DiningRoomScreen.css';
-
-interface Props {
-  found: string[];
-  onFind: (evidenceId: string) => void;
-  onExit: () => void;
-}
-
-export default function DiningRoomScreen({ found, onFind, onExit }: Props) {
-  const [visited, setVisited] = useState<string[]>([]);
-  const [note, setNote] = useState<SampleHotspot | null>(null);
-  const [openCard, setOpenCard] = useState<{ id: string; isNew: boolean } | null>(null);
-
-  const inspect = (spot: SampleHotspot) => {
-    setVisited((prev) => (prev.includes(spot.id) ? prev : [...prev, spot.id]));
-    if (spot.evidenceId) {
-      setNote(null);
-      setOpenCard({ id: spot.evidenceId, isNew: !found.includes(spot.evidenceId) });
-      onFind(spot.evidenceId);
-    } else {
-      setNote(spot);
-    }
-  };
-
-  return (
-    <main className="room-screen">
-      <header className="room-header">
-        <div>
-          <p className="room-kicker">Ashgrove Manor · Ground floor</p>
-          <h1 className="room-title">The Dining Room</h1>
-        </div>
-        <button className="btn btn-ghost" onClick={onExit}>
-          Leave
-        </button>
-      </header>
-
-      <div className="scene">
-        <DiningRoomScene />
-        {diningRoomHotspots.map((spot) => (
-          <button
-            key={spot.id}
-            className={`hotspot${visited.includes(spot.id) ? ' is-visited' : ''}`}
-            style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
-            onClick={() => inspect(spot)}
-            aria-label={`Inspect: ${spot.label}`}
-          >
-            <span className="hotspot-ring" aria-hidden="true" />
-            <span className="hotspot-label">{spot.label}</span>
-          </button>
-        ))}
-      </div>
-
-      <p className="room-hint">Tap a glowing point to look closer.</p>
-
-      {note && (
-        <aside className="note-slip" aria-live="polite">
-          <p className="note-title">{note.label}</p>
-          <p className="note-text">{note.note}</p>
-          <button className="note-close" onClick={() => setNote(null)} aria-label="Dismiss note">
-            ×
-          </button>
-        </aside>
-      )}
-
-      <section className="case-tray" aria-label="Case file">
-        <h2 className="case-tray-title">
-          Case file <span className="case-tray-count">{found.length}</span>
-        </h2>
-        {found.length === 0 ? (
-          <p className="case-tray-empty">No evidence collected yet.</p>
-        ) : (
-          <ul className="case-tray-list">
-            {found.map((id) => (
-              <li key={id}>
-                <button
-                  className="tray-item"
-                  onClick={() => setOpenCard({ id, isNew: false })}
-                >
-                  <span className="tray-item-id">{id}</span>
-                  {evidence[id].name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {openCard && (
-        <EvidenceCard
-          evidence={evidence[openCard.id]}
-          isNew={openCard.isNew}
-          onClose={() => setOpenCard(null)}
-        />
-      )}
-    </main>
-  );
-}
+// Dining room illustration (originally the M1 prototype art). Decorative only.
 
 /** Stylised CSS/SVG illustration of the dining room. Decorative only. */
-function DiningRoomScene() {
+export default function DiningScene() {
   return (
     <svg className="scene-art" viewBox="0 0 1000 600" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
       <defs>
@@ -164,6 +65,10 @@ function DiningRoomScene() {
       <ellipse cx="495" cy="150" rx="26" ry="32" fill="#2c241d" />
       <path d="M450 238 q45 -70 90 0 z" fill="#2c241d" />
 
+      {/* Jib door: a faint seam in the wallpaper */}
+      <path d="M640 150 V330 M640 150 H700 M700 150 V330" stroke="#0e1410" strokeWidth="2" fill="none" opacity="0.9" />
+      <circle cx="694" cy="250" r="2.5" fill="#3a4a3f" />
+
       {/* Sideboard with fern */}
       <rect x="740" y="290" width="210" height="110" fill="#2a1a10" />
       <rect x="730" y="282" width="230" height="12" fill="#3d2616" />
@@ -203,6 +108,11 @@ function DiningRoomScene() {
       <ellipse cx="300" cy="410" rx="34" ry="8" fill="#f4efe2" />
       <path d="M290 410 q10 -34 20 0 z" fill="#f4efe2" stroke="#cfc6b0" />
       <rect x="250" y="404" width="10" height="3" fill="#b8955a" />
+
+      {/* Tonic tray with the prescription bottle */}
+      <ellipse cx="200" cy="432" rx="34" ry="8" fill="#b8955a" />
+      <rect x="192" y="400" width="14" height="30" rx="3" fill="#6b3e1c" />
+      <rect x="195" y="394" width="8" height="8" fill="#c8b48a" />
 
       <rect width="1000" height="600" fill="url(#vignette)" />
     </svg>

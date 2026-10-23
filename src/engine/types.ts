@@ -11,7 +11,7 @@ export interface Condition {
   evidence?: string[];
   /** Hotspots the player has examined. */
   examined?: string[];
-  /** Suspects the player has opened an interview with. */
+  /** Suspects the player has interviewed: asked a topic or pressed a statement. */
   interviewed?: string[];
   /** Contradictions the player has broken. */
   contradictions?: string[];
@@ -96,6 +96,29 @@ export interface AccusationDef {
   slots: Record<SlotId, SlotDef>;
   /** Rebuttal for each innocent suspect, keyed by suspect id. */
   rebuttals: Record<string, string>;
+  /** When the partner signals the case is ready (the Accuse button is always available). */
+  readyWhen: Condition;
+}
+
+/**
+ * A partner hint. Hints are checked in order; the first whose `requires` is
+ * met and whose `doneWhen` is not yet met is the current one. Tiers escalate
+ * from a nudge to an explicit instruction.
+ */
+export interface HintDef {
+  id: string;
+  requires?: Condition;
+  doneWhen: Condition;
+  tiers: string[];
+}
+
+/** Narrative text the engine carries but never interprets. */
+export interface StoryDef {
+  intro: string[];
+  readyLine: string;
+  /** One beat per slot, played when the case is proven. */
+  confrontation: Record<SlotId, string[]>;
+  epilogue: string[];
 }
 
 export interface CaseData {
@@ -107,6 +130,8 @@ export interface CaseData {
   locations: LocationDef[];
   suspects: SuspectDef[];
   accusation: AccusationDef;
+  hints: HintDef[];
+  story: StoryDef;
 }
 
 // ---------------------------------------------------------------------------
@@ -118,8 +143,8 @@ export type RatingId = 'master' | 'chief' | 'dogged';
 export interface CaseStats {
   contradictionsFound: number;
   contradictionsTotal: number;
-  innocentsCleared: number;
-  innocentsTotal: number;
+  secretsUncovered: number;
+  secretsTotal: number;
 }
 
 export type AccusationResult =
@@ -137,7 +162,6 @@ export type GameEvent =
   | { kind: 'none' }
   | { kind: 'rejected'; reason: string }
   | { kind: 'examined'; hotspotId: string; gained: string[]; note?: string }
-  | { kind: 'interviewOpened'; suspectId: string; firstTime: boolean }
   | { kind: 'topic'; suspectId: string; topicId: string; lines: string[]; gained: string[] }
   | { kind: 'contradiction'; contradictionId: string; response: string[]; gained: string[] }
   | { kind: 'alreadyBroken'; contradictionId: string }
@@ -149,6 +173,7 @@ export interface GameState {
   /** Held evidence and testimony, in the order found. */
   evidence: string[];
   examined: string[];
+  /** Suspects asked at least one topic or pressed on at least one statement. */
   interviewed: string[];
   /** Topic keys as `${suspectId}:${topicId}`. */
   topicsHeard: string[];
@@ -163,7 +188,6 @@ export interface GameState {
 
 export type GameAction =
   | { type: 'examine'; locationId: string; hotspotId: string }
-  | { type: 'openInterview'; suspectId: string }
   | { type: 'askTopic'; suspectId: string; topicId: string }
   | { type: 'press'; suspectId: string; statementId: string; evidenceId: string }
   | { type: 'accuse'; accusation: Accusation }

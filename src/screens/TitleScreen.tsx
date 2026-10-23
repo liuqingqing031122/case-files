@@ -49,7 +49,7 @@ export default function TitleScreen({ onEnter }: Props) {
         </div>
       </div>
 
-      <p className="title-footnote">Prototype build · progress is not saved yet</p>
+      <p className="title-footnote">Early build · progress is not saved between visits yet</p>
     </main>
   );
 }

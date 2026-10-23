@@ -67,7 +67,7 @@ describe('accusation outcomes', () => {
     expect(s.outcome).toEqual({
       kind: 'proven',
       rating: 'master',
-      stats: { contradictionsFound: 1, contradictionsTotal: 2, innocentsCleared: 1, innocentsTotal: 1 },
+      stats: { contradictionsFound: 1, contradictionsTotal: 2, secretsUncovered: 1, secretsTotal: 1 },
     });
     expect(s.credibility).toBe(5);
 
@@ -79,7 +79,7 @@ describe('accusation outcomes', () => {
   it('accepts any listed card for a slot', () => {
     const s = play(
       [
-        { type: 'openInterview', suspectId: 'cook' },
+        { type: 'askTopic', suspectId: 'cook', topicId: 'kitchen' },
         { type: 'askTopic', suspectId: 'cook', topicId: 'shopping' },
         accuse('butler', { motive: 'ledger', means: 'tCook', opportunity: 'tMaid', physical: 'mud' }),
       ],
@@ -126,12 +126,12 @@ describe('rating', () => {
 });
 
 describe('caseStats', () => {
-  it('counts contradictions and cleared innocents (only innocents who have lies)', () => {
+  it('counts contradictions and secrets uncovered (only innocents who have lies)', () => {
     expect(caseStats(miniCase, play([]))).toEqual({
       contradictionsFound: 0,
       contradictionsTotal: 2,
-      innocentsCleared: 0,
-      innocentsTotal: 1,
+      secretsUncovered: 0,
+      secretsTotal: 1,
     });
   });
 });

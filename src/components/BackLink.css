@@ -1,0 +1,39 @@
+/* Sticks under the game header (whose height GameHeader publishes as --header-h). */
+.back-bar {
+  position: sticky;
+  top: var(--header-h, 110px);
+  z-index: 15;
+  margin: -24px calc(-1 * var(--gutter)) 12px;
+  padding: 4px var(--gutter);
+  background: rgba(20, 15, 12, 0.9);
+  border-bottom: 1px solid rgba(201, 163, 95, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-left: -4px;
+  padding: 6px 12px 6px 4px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  font-family: var(--font-type);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brass);
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: #e2c27f;
+  background: rgba(201, 163, 95, 0.1);
+}
+
+.back-link span {
+  font-size: 1.15rem;
+  line-height: 1;
+}

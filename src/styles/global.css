@@ -95,6 +95,113 @@ button {
   background: #3a322c;
 }
 
+.btn-ghost-ink {
+  background: transparent;
+  border-color: rgba(42, 36, 32, 0.35);
+  color: var(--ink);
+}
+
+.btn-ghost-ink:hover {
+  background: rgba(42, 36, 32, 0.06);
+}
+
+/* Small toggle buttons (filters) */
+.chip {
+  min-height: 36px;
+  padding: 4px 14px;
+  border: 1px solid rgba(42, 36, 32, 0.3);
+  border-radius: 18px;
+  background: transparent;
+  font-family: var(--font-type);
+  font-size: 0.8rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+/* In-game page shell */
+.page {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 24px var(--gutter) 64px;
+}
+
+.page-kicker {
+  margin: 0;
+  font-family: var(--font-type);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(239, 230, 210, 0.55);
+}
+
+.page-title {
+  margin: 4px 0 18px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  color: var(--paper);
+}
+
+.page-intro {
+  margin: -8px 0 22px;
+  max-width: 640px;
+  font-family: var(--font-type);
+  color: rgba(239, 230, 210, 0.7);
+}
+
+/* Observation slip */
+.note-slip {
+  position: relative;
+  margin: 16px auto 0;
+  max-width: 620px;
+  padding: 14px 44px 14px 18px;
+  background: #f4e9a8;
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  transform: rotate(-0.8deg);
+  animation: slip-in 220ms ease both;
+}
+
+.note-title {
+  margin: 0 0 4px;
+  font-family: var(--font-type);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.note-text {
+  margin: 0;
+  font-family: var(--font-type);
+  line-height: 1.6;
+}
+
+.note-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+@keyframes slip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) rotate(-0.8deg);
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -71,6 +71,17 @@ export function validateCase(data: CaseData): string[] {
   for (const id of suspectIds) {
     if (id !== culpritId && !rebuttals[id]) errors.push(`No rebuttal for innocent suspect "${id}"`);
   }
+  checkCondition('accusation readyWhen', data.accusation.readyWhen);
+
+  checkDuplicates('hint', data.hints.map((h) => h.id));
+  for (const hint of data.hints) {
+    checkCondition(`hint ${hint.id}`, hint.requires);
+    checkCondition(`hint ${hint.id} doneWhen`, hint.doneWhen);
+    if (hint.tiers.length === 0) errors.push(`Hint ${hint.id} has no tiers`);
+  }
+  for (const slot of SLOT_IDS) {
+    if (!data.story.confrontation[slot]?.length) errors.push(`No confrontation beat for slot ${slot}`);
+  }
 
   return errors;
 }

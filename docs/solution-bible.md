@@ -92,7 +92,7 @@ From 8:00 until the rooms were locked, Theo was never alone in the dining room, 
 | Suspect | Secret | First-account alibi | Truth |
 |---|---|---|---|
 | **Victoria** | Edmund's failing heart. She bought the second bottle for him. | "Dressing in my room." | True. Clara was with her from the three-quarters. No key. |
-| **Julian** | £600 debt to Sid Marlow. Broke into the desk. | "Dressing, then straight down at the bell." | False. In the study, then upstairs. No key. |
+| **Julian** | £600 debt to Sid Marlow. Broke into the desk. | "I went up to dress after the gong, and I was at the table for the bell." (Technically true; hides the study visit, which C2 exposes.) | In the study, then upstairs. No key. |
 | **Clara** | Trained nurse (St Thomas's), secretly married to Daniel Reyes. | "With Victoria from the three-quarters." | True. Her 8:40 absence came after the poison was drunk. |
 | **Mrs. Pell** | Feeds her son Tom, just out of prison, at the gate. | "Kitchen and pantry from the gong to the bell, bar laying the tonic. Never set foot out of doors." | False. Outside about 10 minutes. Saw the jib door closing. |
 | **Theo** | Forgery, then murder. | "In the study from half seven to the bell. No one came in or out." | False. In the dining room from the chime until just before the bell. |
@@ -165,11 +165,14 @@ Wrong presentation: a short in-character rebuff and −1 credibility. Nothing is
 | Examine E7 | E8 |
 | Read E8 or E11 ("B.L.") | Blotter hotspot → E12 |
 | Examine E9 | Theo topic "The desk" → T-F |
-| Open Pell's interview | **Servants' Hall** ("the tonic's mixed in my pantry") |
-| Open the Victoria, Julian and Clara interviews | **Upstairs** (Gale: "The family consent to a search.") |
+| Interview Mrs. Pell | **Servants' Hall** ("the tonic's mixed in my pantry") |
+| Interview Victoria, Julian and Clara | **Upstairs** (Gale: "The family consent to a search.") |
 | C1–C4 | Testimony cards plus a "Your secret" topic for each suspect |
+| Hold E12 + E14 + E17 + (T-A or T-C) | Gale: "I think we're ready, Detective." The Accuse tab is highlighted, though it is always available. Includes E17 because v2 made Physical Evidence a required slot. |
 
-**Dialogue rules:** topics add new lines and never close. Every topic can be asked again. Every statement can be pressed again. No choice can be missed.
+**Interviewed** means the player has asked a suspect at least one available topic, or pressed one of their statements (even with the wrong card). Opening a suspect's page does not count. Every suspect has topics that are always available, so this can never deadlock.
+
+**Dialogue rules:** statements without a contradiction are technically true, so pressing them is only ever a wrong guess, never a missed lie. Topics add new lines and never close. Every topic can be asked again. Every statement can be pressed again. No choice can be missed.
 **Hints (Gale):** three tiers, keyed to the next missing *required* card. Example: "That shirt's cuff…", then "Compare it with the tonic bottle's label", then "Show Theo the shirt."
 
 ---
@@ -211,7 +214,7 @@ Near-misses get tailored feedback. For example, E8 in Motive: "That shows what h
 | Proven with ≤ 1 failed submission | **Chief Inspector Material** |
 | Proven after more attempts | **Dogged Detective** |
 
-The results screen also shows **Contradictions found: x/8** and **Innocents cleared: x/4** (C1–C4) as bonus stats. Credibility starts at 5 and has a floor of 0, and it never blocks play.
+The results screen also shows **Contradictions found: x/8** and **Secrets uncovered: x/4** (C1–C4: an innocent's lie exposed. This does not by itself prove them innocent.) as bonus stats. Credibility starts at 5 and has a floor of 0, and it never blocks play.
 
 ---
 
@@ -219,10 +222,10 @@ The results screen also shows **Contradictions found: x/8** and **Innocents clea
 | Required card | Where | Prerequisite | Branch-safe? |
 |---|---|---|---|
 | E12 Bank Letter | Study | Examine E7→E8, or E11 (both open at start) | Yes |
-| E14 Household Book | Servants' Hall | Open Pell's interview | Yes |
+| E14 Household Book | Servants' Hall | Interview Mrs. Pell | Yes |
 | T-B / T-F (alt. means) | Pell after C1, or Theo topic after E9 | E13, or E9 | Yes |
 | T-A or T-C (opportunity) | C1 (E13 + Pell's first account) or C2 (E10 + Julian's first account) | As listed | Yes, two independent routes |
-| E17 Laundry | Servants' Hall | Open Pell's interview | Yes |
+| E17 Laundry | Servants' Hall | Interview Mrs. Pell | Yes |
 
 - Every inference uses only in-game text. The window comes from E1 + E2 + Pell's "as the clock struck". The jib-door geometry comes from E3. The tincture's appearance comes from E5. The shirt being from that night comes from E17's own description.
 - Each innocent can be cleared with in-game evidence (§7).

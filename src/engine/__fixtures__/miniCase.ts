@@ -92,6 +92,7 @@ export const miniCase: CaseData = {
       defaultWrongResponse: 'Eh?',
       statements: [{ id: 'alibi', text: 'I was in the kitchen.' }],
       topics: [
+        { id: 'kitchen', label: 'The kitchen', lines: ['Busy night.'] },
         {
           id: 'shopping',
           label: 'The shopping',
@@ -118,5 +119,26 @@ export const miniCase: CaseData = {
       maid: 'The maid was at market.',
       cook: 'The cook never left the kitchen.',
     },
+    readyWhen: { evidence: ['ledger', 'tMaid', 'mud'] },
+  },
+  hints: [
+    { id: 'desk', doneWhen: { evidence: ['ledger'] }, tiers: ['Check the hall.', 'Examine the desk.'] },
+    {
+      id: 'maid',
+      requires: { interviewed: ['maid'] },
+      doneWhen: { contradictions: ['cMaid'] },
+      tiers: ['The maid is hiding something.'],
+    },
+  ],
+  story: {
+    intro: ['A brooch is missing.'],
+    readyLine: 'We have enough.',
+    confrontation: {
+      motive: ['He owed money.'],
+      means: ['He had the glove.'],
+      opportunity: ['He was outside.'],
+      physical: ['His boots were muddy.'],
+    },
+    epilogue: ['The brooch was found.'],
   },
 };

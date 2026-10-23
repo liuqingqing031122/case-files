@@ -4,6 +4,7 @@ import type {
   CaseData,
   Condition,
   GameState,
+  HintDef,
   HotspotDef,
   LocationDef,
   StatementDef,
@@ -53,6 +54,13 @@ export const visibleHotspots = (location: LocationDef, state: GameState): Hotspo
 
 export const availableTopics = (suspect: SuspectDef, state: GameState): TopicDef[] =>
   suspect.topics.filter((t) => isMet(t.requires, state));
+
+/** The partner's current hint, or undefined when nothing required is missing. */
+export const nextHint = (data: CaseData, state: GameState): HintDef | undefined =>
+  data.hints.find((h) => isMet(h.requires, state) && !isMet(h.doneWhen, state));
+
+export const isReadyToAccuse = (data: CaseData, state: GameState): boolean =>
+  isMet(data.accusation.readyWhen, state);
 
 /** Every contradiction defined in the case, with the suspect it belongs to. */
 export function allContradictions(data: CaseData) {

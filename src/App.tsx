@@ -1,31 +1,59 @@
-import { useState } from 'react';
-import TitleScreen from './screens/TitleScreen';
+import { ashgrove } from './case/ashgrove';
+import GameHeader from './components/GameHeader';
+import Toasts from './components/Toasts';
+import { GameProvider, useGame } from './game/GameContext';
+import AccuseScreen from './screens/AccuseScreen';
+import CaseFileScreen from './screens/CaseFileScreen';
+import EndingScreen from './screens/EndingScreen';
+import InterviewScreen from './screens/InterviewScreen';
 import IntroScreen from './screens/IntroScreen';
-import DiningRoomScreen from './screens/DiningRoomScreen';
-
-// M1 prototype: plain useState for navigation. The real game state
-// (reducer + save) arrives in M2.
-type Screen = 'title' | 'intro' | 'dining';
+import LocationScreen from './screens/LocationScreen';
+import RoomsScreen from './screens/RoomsScreen';
+import SuspectsScreen from './screens/SuspectsScreen';
+import TitleScreen from './screens/TitleScreen';
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('title');
-  const [found, setFound] = useState<string[]>([]);
+  return (
+    <GameProvider data={ashgrove}>
+      <Screens />
+      <Toasts />
+    </GameProvider>
+  );
+}
 
-  const addToCaseFile = (id: string) =>
-    setFound((prev) => (prev.includes(id) ? prev : [...prev, id]));
+function Screens() {
+  const { data, state, view, go } = useGame();
 
-  switch (screen) {
-    case 'title':
-      return <TitleScreen onEnter={() => setScreen('intro')} />;
-    case 'intro':
-      return <IntroScreen onContinue={() => setScreen('dining')} onBack={() => setScreen('title')} />;
-    case 'dining':
+  switch (view.name) {
+    case 'title': {
+      const started = state.examined.length > 0 || state.interviewed.length > 0;
       return (
-        <DiningRoomScreen
-          found={found}
-          onFind={addToCaseFile}
-          onExit={() => setScreen('title')}
+        <TitleScreen
+          onEnter={() => go(state.outcome ? { name: 'ending' } : started ? { name: 'rooms' } : { name: 'intro' })}
         />
+      );
+    }
+    case 'intro':
+      return (
+        <IntroScreen
+          paragraphs={data.story.intro}
+          onContinue={() => go({ name: 'location', id: 'dining' })}
+          onBack={() => go({ name: 'title' })}
+        />
+      );
+    case 'ending':
+      return <EndingScreen />;
+    default:
+      return (
+        <>
+          <GameHeader />
+          {view.name === 'rooms' && <RoomsScreen />}
+          {view.name === 'location' && <LocationScreen key={view.id} locationId={view.id} />}
+          {view.name === 'suspects' && <SuspectsScreen />}
+          {view.name === 'interview' && <InterviewScreen key={view.id} suspectId={view.id} />}
+          {view.name === 'casefile' && <CaseFileScreen />}
+          {view.name === 'accuse' && <AccuseScreen />}
+        </>
       );
   }
 }

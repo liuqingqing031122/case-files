@@ -14,7 +14,7 @@ describe('initialState', () => {
   it('is plain JSON so it can be saved', () => {
     const s = play([
       { type: 'examine', locationId: 'hall', hotspotId: 'coatStand' },
-      { type: 'openInterview', suspectId: 'maid' },
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
     ]);
     expect(JSON.parse(JSON.stringify(s))).toEqual(s);
   });
@@ -70,9 +70,9 @@ describe('examine', () => {
     expect(viaLedger.lastEvent.kind).toBe('examined');
 
     const viaContradiction = play([
-      { type: 'openInterview', suspectId: 'maid' },
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
       { type: 'examine', locationId: 'pantry', hotspotId: 'backDoor' },
-      { type: 'openInterview', suspectId: 'butler' },
+      { type: 'askTopic', suspectId: 'butler', topicId: 'brooch' },
       { type: 'press', suspectId: 'butler', statementId: 'alibi', evidenceId: 'mud' },
       { type: 'examine', locationId: 'cellar', hotspotId: 'barrel' },
     ]);
@@ -81,54 +81,60 @@ describe('examine', () => {
 });
 
 describe('interviews and topics', () => {
-  it('opening an interview unlocks dependent locations', () => {
+  it('asking an available topic counts as interviewing, and unlocks dependent locations', () => {
     const s = play([
-      { type: 'openInterview', suspectId: 'maid' },
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
       { type: 'examine', locationId: 'pantry', hotspotId: 'shelf' },
     ]);
     expect(s.interviewed).toEqual(['maid']);
     expect(s.evidence).toContain('receipt');
   });
 
-  it('reports whether an interview is opened for the first time', () => {
-    const once = play([{ type: 'openInterview', suspectId: 'maid' }]);
-    expect(once.lastEvent).toEqual({ kind: 'interviewOpened', suspectId: 'maid', firstTime: true });
-    const twice = play([{ type: 'openInterview', suspectId: 'maid' }], miniCase, once);
-    expect(twice.lastEvent).toMatchObject({ firstTime: false });
-    expect(twice.interviewed).toEqual(['maid']);
+  it('pressing a statement counts as interviewing, even with the wrong card', () => {
+    const s = play([{ type: 'press', suspectId: 'maid', statementId: 'alibi', evidenceId: 'note' }]);
+    expect(s.lastEvent.kind).toBe('wrongPress');
+    expect(s.interviewed).toEqual(['maid']);
+    expect(play([{ type: 'examine', locationId: 'pantry', hotspotId: 'shelf' }], miniCase, s).evidence).toContain('receipt');
   });
 
-  it('requires the interview to be open before asking topics', () => {
-    const s = play([{ type: 'askTopic', suspectId: 'maid', topicId: 'evening' }]);
-    expect(s.lastEvent.kind).toBe('rejected');
+  it('a locked topic or an unheld card does not count as interviewing', () => {
+    const locked = play([{ type: 'askTopic', suspectId: 'cook', topicId: 'shopping' }]);
+    expect(locked.lastEvent.kind).toBe('rejected');
+    expect(locked.interviewed).toEqual([]);
+
+    const unheld = play([{ type: 'press', suspectId: 'maid', statementId: 'alibi', evidenceId: 'receipt' }]);
+    expect(unheld.lastEvent.kind).toBe('rejected');
+    expect(unheld.interviewed).toEqual([]);
+  });
+
+  it('interviewing a suspect twice does not duplicate them', () => {
+    const s = play([
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
+    ]);
+    expect(s.interviewed).toEqual(['maid']);
+    expect(s.topicsHeard).toEqual(['maid:evening']);
   });
 
   it('gated topics give testimony once unlocked, and can be re-asked', () => {
-    const locked = play([
-      { type: 'openInterview', suspectId: 'cook' },
-      { type: 'askTopic', suspectId: 'cook', topicId: 'shopping' },
-    ]);
-    expect(locked.lastEvent.kind).toBe('rejected');
-
     const steps = [
-      { type: 'openInterview', suspectId: 'maid' },
+      { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
       { type: 'examine', locationId: 'pantry', hotspotId: 'shelf' },
-      { type: 'openInterview', suspectId: 'cook' },
       { type: 'askTopic', suspectId: 'cook', topicId: 'shopping' },
     ] as const;
     const s = play([...steps]);
     expect(s.evidence).toContain('tCook');
-    expect(s.topicsHeard).toEqual(['cook:shopping']);
+    expect(s.topicsHeard).toEqual(['maid:evening', 'cook:shopping']);
 
     const again = play([{ type: 'askTopic', suspectId: 'cook', topicId: 'shopping' }], miniCase, s);
     expect(again.lastEvent).toMatchObject({ kind: 'topic', gained: [] });
-    expect(again.topicsHeard).toEqual(['cook:shopping']);
+    expect(again.topicsHeard).toEqual(['maid:evening', 'cook:shopping']);
   });
 });
 
 describe('pressing statements', () => {
   const ready = play([
-    { type: 'openInterview', suspectId: 'maid' },
+    { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
     { type: 'examine', locationId: 'pantry', hotspotId: 'shelf' },
   ]);
 
@@ -143,11 +149,11 @@ describe('pressing statements', () => {
   it('accepts any of several cards for the same contradiction', () => {
     for (const card of ['mud', 'tMaid']) {
       const s = play([
-        { type: 'openInterview', suspectId: 'maid' },
+        { type: 'askTopic', suspectId: 'maid', topicId: 'evening' },
         { type: 'examine', locationId: 'pantry', hotspotId: 'shelf' },
         { type: 'examine', locationId: 'pantry', hotspotId: 'backDoor' },
         { type: 'press', suspectId: 'maid', statementId: 'alibi', evidenceId: 'receipt' },
-        { type: 'openInterview', suspectId: 'butler' },
+        { type: 'askTopic', suspectId: 'butler', topicId: 'brooch' },
         { type: 'press', suspectId: 'butler', statementId: 'alibi', evidenceId: card },
       ]);
       expect(s.contradictions).toContain('cButler');
@@ -169,7 +175,7 @@ describe('pressing statements', () => {
 
   it('falls back to the suspect’s default reply, and true statements cannot be broken', () => {
     const s = play([
-      { type: 'openInterview', suspectId: 'cook' },
+      { type: 'askTopic', suspectId: 'cook', topicId: 'kitchen' },
       { type: 'press', suspectId: 'cook', statementId: 'alibi', evidenceId: 'note' },
     ]);
     expect(s.lastEvent).toMatchObject({ kind: 'wrongPress', response: 'Eh?' });
@@ -191,13 +197,10 @@ describe('pressing statements', () => {
     expect(again.credibility).toBe(5);
   });
 
-  it('rejects cards the player does not hold, and pressing before the interview', () => {
+  it('rejects cards the player does not hold, with no penalty', () => {
     const unheld = reduce(miniCase, ready, { type: 'press', suspectId: 'maid', statementId: 'alibi', evidenceId: 'mud' });
     expect(unheld.lastEvent.kind).toBe('rejected');
     expect(unheld.credibility).toBe(5);
-
-    const early = play([{ type: 'press', suspectId: 'butler', statementId: 'alibi', evidenceId: 'note' }]);
-    expect(early.lastEvent.kind).toBe('rejected');
   });
 });
 
@@ -206,7 +209,7 @@ describe('purity', () => {
     const before = initialState(miniCase);
     const snapshot = JSON.stringify(before);
     reduce(miniCase, before, { type: 'examine', locationId: 'hall', hotspotId: 'coatStand' });
-    reduce(miniCase, before, { type: 'openInterview', suspectId: 'maid' });
+    reduce(miniCase, before, { type: 'askTopic', suspectId: 'maid', topicId: 'evening' });
     expect(JSON.stringify(before)).toBe(snapshot);
   });
 

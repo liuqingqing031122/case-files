@@ -59,21 +59,23 @@
   text-align: right;
 }
 
+.memo-body .memo-ps {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(42, 36, 32, 0.3);
+  font-size: 0.95rem;
+}
+
+.memo-ps strong {
+  font-weight: 400;
+  color: var(--oxblood);
+}
+
 .memo-actions {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-top: 12px;
-}
-
-.btn-ghost-ink {
-  background: transparent;
-  border-color: rgba(42, 36, 32, 0.35);
-  color: var(--ink);
-}
-
-.btn-ghost-ink:hover {
-  background: rgba(42, 36, 32, 0.06);
 }
 
 @keyframes memo-in {
