@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { isReadyToAccuse, nextHint } from '../engine';
+import { GUIDE_ENTRY_LABEL } from '../game/guide';
 import { useGame, type View } from '../game/GameContext';
 import './GameHeader.css';
 
@@ -11,12 +12,21 @@ const TABS: { label: string; view: View; matches: View['name'][] }[] = [
 ];
 
 export default function GameHeader() {
-  const { data, state, view, go, galeOpened, markGaleOpened } = useGame();
+  const { data, state, view, go, galeOpened, markGaleOpened, openGuide, coachTarget } = useGame();
   const [hintOpen, setHintOpen] = useState(false);
   const ready = isReadyToAccuse(data, state);
   const headerRef = useRef<HTMLElement>(null);
   const galeButtonRef = useRef<HTMLButtonElement>(null);
   const hintPanelRef = useRef<HTMLElement>(null);
+
+  // Open the guide from Gale's panel without stacking two overlays: close the
+  // panel first, and put focus on the Ask Gale button so the guide hands focus
+  // back there when it closes (the link itself disappears with the panel).
+  const openGuideFromPanel = () => {
+    setHintOpen(false);
+    galeButtonRef.current?.focus({ preventScroll: true });
+    openGuide();
+  };
 
   // Close Gale's note on Escape or on any press outside it. No overlay, so the
   // press still reaches whatever was clicked. The Ask Gale button toggles itself.
@@ -63,7 +73,7 @@ export default function GameHeader() {
           <Credibility value={state.credibility} max={data.startingCredibility} />
           <button
             ref={galeButtonRef}
-            className={`gale-button${hintOpen ? ' is-open' : ''}${galeOpened ? '' : ' is-new'}`}
+            className={`gale-button${hintOpen ? ' is-open' : ''}${galeOpened ? '' : ' is-new'}${coachTarget === 'gale' ? ' is-coached' : ''}`}
             onClick={() => {
               setHintOpen((o) => !o);
               markGaleOpened();
@@ -102,7 +112,9 @@ export default function GameHeader() {
         })}
       </nav>
 
-      {hintOpen && <HintPanel panelRef={hintPanelRef} onClose={() => setHintOpen(false)} />}
+      {hintOpen && (
+        <HintPanel panelRef={hintPanelRef} onClose={() => setHintOpen(false)} onOpenGuide={openGuideFromPanel} />
+      )}
     </header>
   );
 }
@@ -127,7 +139,15 @@ function Credibility({ value, max }: { value: number; max: number }) {
   );
 }
 
-function HintPanel({ onClose, panelRef }: { onClose: () => void; panelRef: RefObject<HTMLElement> }) {
+function HintPanel({
+  onClose,
+  panelRef,
+  onOpenGuide,
+}: {
+  onClose: () => void;
+  panelRef: RefObject<HTMLElement>;
+  onOpenGuide: () => void;
+}) {
   const { data, state, hintTiers, revealHintTier } = useGame();
   const hint = nextHint(data, state);
   const tier = hint ? (hintTiers[hint.id] ?? 1) : 0;
@@ -154,6 +174,9 @@ function HintPanel({ onClose, panelRef }: { onClose: () => void; panelRef: RefOb
           “{isReadyToAccuse(data, state) ? data.story.readyLine : 'Nothing springs to mind, Detective. Keep at it.'}”
         </p>
       )}
+      <button className="hint-guide" onClick={onOpenGuide}>
+        {GUIDE_ENTRY_LABEL}
+      </button>
       <button className="note-close" onClick={onClose} aria-label="Close hint">
         ×
       </button>

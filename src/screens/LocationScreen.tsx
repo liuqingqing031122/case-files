@@ -3,13 +3,26 @@ import { findLocation, visibleHotspots, type HotspotDef } from '../engine';
 import BackLink from '../components/BackLink';
 import { scrollBehavior } from '../components/motion';
 import EvidenceCard from '../components/EvidenceCard';
+import DetectivesNote from '../components/DetectivesNote';
 import { useGame } from '../game/GameContext';
+import { useNotes } from '../game/useNotes';
 import { HOTSPOT_POSITIONS } from '../game/uiContent';
 import { SCENES } from '../scenes';
 import './LocationScreen.css';
 
 export default function LocationScreen({ locationId }: { locationId: string }) {
-  const { data, state, act, go } = useGame();
+  const { data, state, act, go, setCoachTarget } = useGame();
+  const notes = useNotes(['room-search', 'room-gale']);
+  const galeNote = notes.next === 'room-gale';
+  useEffect(() => {
+    setCoachTarget(galeNote ? 'gale' : null);
+    return () => setCoachTarget(null);
+  }, [galeNote, setCoachTarget]);
+  const focusNoteTarget = (id: string) =>
+    (id === 'room-search'
+      ? document.querySelector<HTMLElement>('.spot-item')
+      : document.querySelector<HTMLElement>('.gale-button')
+    )?.focus();
   // The observation being shown. `seq` changes on every click, so clicking the
   // same spot again replays the slip's entrance and brings it back into view.
   const [note, setNote] = useState<{ spot: HotspotDef; seq: number } | null>(null);
@@ -48,6 +61,24 @@ export default function LocationScreen({ locationId }: { locationId: string }) {
       <p className="page-kicker">Ashgrove Manor</p>
       <h1 className="page-title">{location.name}</h1>
 
+      {notes.next && (
+        <DetectivesNote
+          key={notes.next}
+          id={notes.next}
+          position={notes.position(notes.next)}
+          onGotIt={(kb) => {
+            const id = notes.next!;
+            notes.dismiss(id);
+            if (kb) focusNoteTarget(id);
+          }}
+          onSkip={(kb) => {
+            const id = notes.next!;
+            notes.skip();
+            if (kb) focusNoteTarget(id);
+          }}
+        />
+      )}
+
       <div className="scene-stage">
         <div className="scene">
           {Scene && <Scene />}
@@ -82,7 +113,10 @@ export default function LocationScreen({ locationId }: { locationId: string }) {
 
       <p className="room-hint">Tap a glowing point to look closer, or choose from the list below.</p>
 
-      <ul className="spot-list" aria-label={`Things to inspect in ${location.name}`}>
+      <ul
+        className={`spot-list${notes.next === 'room-search' ? ' is-coached' : ''}`}
+        aria-label={`Things to inspect in ${location.name}`}
+      >
         {/* Deliberately no "examined" markers: players judge for themselves when a room is done. */}
         {spots.map((spot) => (
           <li key={spot.id}>

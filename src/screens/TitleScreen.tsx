@@ -14,11 +14,13 @@ interface Props {
   onContinue: () => void;
   /** Starts a new game. Confirmation is handled here when progress exists. */
   onNewGame: () => void;
+  /** Opens the optional Detective's Guide. */
+  onHowToPlay: () => void;
 }
 
 const STATUS: Record<TitleMode, string> = { fresh: 'Unsolved', inProgress: 'In progress', solved: 'Solved' };
 
-export default function TitleScreen({ mode, savedLabel, unreadableSave, onContinue, onNewGame }: Props) {
+export default function TitleScreen({ mode, savedLabel, unreadableSave, onContinue, onNewGame, onHowToPlay }: Props) {
   const [confirming, setConfirming] = useState(false);
   const primaryRef = useFocusOnMount<HTMLButtonElement>();
   const hasGame = mode !== 'fresh';
@@ -75,6 +77,10 @@ export default function TitleScreen({ mode, savedLabel, unreadableSave, onContin
               </button>
             )}
           </div>
+
+          <button className="folder-howto" onClick={onHowToPlay}>
+            How to Play
+          </button>
 
           {hasGame && savedLabel && <p className="folder-saved">{savedLabel}</p>}
           {!hasGame && unreadableSave && (

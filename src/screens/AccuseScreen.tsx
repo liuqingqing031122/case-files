@@ -4,7 +4,9 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import EvidencePicker from '../components/EvidencePicker';
 import Portrait from '../components/Portrait';
 import { ACCUSE_REMINDER, SLOT_LABELS, accusationFeedback, type Feedback } from '../game/feedback';
+import DetectivesNote from '../components/DetectivesNote';
 import { useGame } from '../game/GameContext';
+import { useNotes } from '../game/useNotes';
 import './AccuseScreen.css';
 
 export default function AccuseScreen() {
@@ -14,6 +16,8 @@ export default function AccuseScreen() {
   const [picking, setPicking] = useState<SlotId | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [verdict, setVerdict] = useState<Feedback | null>(null);
+  const notes = useNotes(['accuse']);
+  const focusFirstSuspect = () => document.querySelector<HTMLElement>('.accuse-suspect')?.focus();
 
   const held = state.evidence.map((id) => data.evidence[id]);
   const filled = SLOT_IDS.filter((s) => slots[s]).length;
@@ -68,6 +72,21 @@ export default function AccuseScreen() {
       </p>
       <p className="accuse-reminder">{ACCUSE_REMINDER}</p>
 
+      {/* Shown before the player starts choosing, above the suspects. */}
+      {notes.next && (
+        <DetectivesNote
+          id={notes.next}
+          onGotIt={(kb) => {
+            notes.dismiss('accuse');
+            if (kb) focusFirstSuspect();
+          }}
+          onSkip={(kb) => {
+            notes.skip();
+            if (kb) focusFirstSuspect();
+          }}
+        />
+      )}
+
       <section aria-labelledby="accuse-who">
         <h2 id="accuse-who" className="section-heading">
           1 · Who did it?
@@ -92,7 +111,7 @@ export default function AccuseScreen() {
         <h2 id="accuse-proof" className="section-heading">
           2 · Prove it
         </h2>
-        <ul className="accuse-slots">
+        <ul className={`accuse-slots${notes.next === 'accuse' ? ' is-coached' : ''}`}>
           {SLOT_IDS.map((slot) => {
             const card = slots[slot] ? data.evidence[slots[slot]!] : undefined;
             return (

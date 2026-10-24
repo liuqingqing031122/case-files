@@ -6,7 +6,9 @@ import EvidencePicker from '../components/EvidencePicker';
 import { scrollBehavior } from '../components/motion';
 import Portrait from '../components/Portrait';
 import { pressFeedback, topicFeedback, type Feedback } from '../game/feedback';
+import DetectivesNote from '../components/DetectivesNote';
 import { useGame } from '../game/GameContext';
+import { useNotes } from '../game/useNotes';
 import { newlyAvailableTopics } from '../game/announcements';
 import { INTERVIEW_STATUS_LABELS, interviewStatus } from '../game/interviewStatus';
 import { SUSPECT_INFO } from '../game/uiContent';
@@ -17,6 +19,7 @@ type Tab = 'statements' | 'topics';
 export default function InterviewScreen({ suspectId }: { suspectId: string }) {
   const { data, state, act, go } = useGame();
   const [tab, setTab] = useState<Tab>('statements');
+  const notes = useNotes(['interview-ask', 'interview-challenge']);
   // Each tab keeps its own latest exchange, shown only inside that tab.
   const [exchanges, setExchanges] = useState<Record<Tab, Feedback | null>>({ statements: null, topics: null });
   const [pressing, setPressing] = useState<StatementDef | null>(null);
@@ -92,6 +95,22 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
     { id: 'topics', label: 'Ask about', count: available.length },
   ];
 
+  // A note shows only while the control it points at is on screen and usable:
+  // "Present evidence" buttons exist only on the Statements tab, for unbroken statements.
+  const firstPressable = suspect.statements.find(
+    (st) => !st.contradiction || !state.contradictions.includes(st.contradiction.id),
+  );
+  const canChallenge =
+    tab === 'statements' &&
+    suspect.statements.some((st) => !st.contradiction || !state.contradictions.includes(st.contradiction.id));
+  const shownNote =
+    notes.next === 'interview-ask' || (notes.next === 'interview-challenge' && canChallenge) ? notes.next : undefined;
+  const focusNoteTarget = (id: string) =>
+    (id === 'interview-ask'
+      ? document.getElementById('tab-topics')
+      : document.querySelector<HTMLElement>('.statement-press')
+    )?.focus();
+
   // Standard tabs keyboard pattern: arrows move between tabs, Home/End jump.
   const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
     const ids = tabs.map((t) => t.id);
@@ -127,6 +146,22 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
         about a topic to learn more. A wrong challenge costs a little credibility.
       </p>
 
+      {shownNote && (
+        <DetectivesNote
+          key={shownNote}
+          id={shownNote}
+          position={notes.position(shownNote)}
+          onGotIt={(kb) => {
+            notes.dismiss(shownNote);
+            if (kb) focusNoteTarget(shownNote);
+          }}
+          onSkip={(kb) => {
+            notes.skip();
+            if (kb) focusNoteTarget(shownNote);
+          }}
+        />
+      )}
+
       <div className="interview-tabs" role="tablist" aria-label="Interview actions" onKeyDown={onTabKey}>
         {tabs.map((t) => (
           <button
@@ -136,7 +171,9 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
             aria-selected={tab === t.id}
             aria-controls={`panel-${t.id}`}
             tabIndex={tab === t.id ? 0 : -1}
-            className={`interview-tab${tab === t.id ? ' is-active' : ''}`}
+            className={`interview-tab${tab === t.id ? ' is-active' : ''}${
+              shownNote === 'interview-ask' && t.id === 'topics' ? ' is-coached' : ''
+            }`}
             onClick={() => setTab(t.id)}
           >
             {t.label}
@@ -147,7 +184,9 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
 
       {tab === 'statements' ? (
         <section id="panel-statements" role="tabpanel" aria-labelledby="tab-statements">
-          <p className="panel-intro">Their account of last night. Spot a lie? Present the evidence that disproves it.</p>
+          <p className="panel-intro">
+            Their account of last night. Most statements are true, so challenge only when a card proves one false.
+          </p>
           {exchangePanel}
           <ol className="statement-list">
             {suspect.statements.map((statement) => {
@@ -158,7 +197,12 @@ export default function InterviewScreen({ suspectId }: { suspectId: string }) {
                   {broken ? (
                     <span className="statement-stamp">Contradicted</span>
                   ) : (
-                    <button className="btn btn-ink statement-press" onClick={() => setPressing(statement)}>
+                    <button
+                      className={`btn btn-ink statement-press${
+                        shownNote === 'interview-challenge' && statement.id === firstPressable?.id ? ' is-coached' : ''
+                      }`}
+                      onClick={() => setPressing(statement)}
+                    >
                       Present evidence
                     </button>
                   )}

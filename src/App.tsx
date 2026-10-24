@@ -1,5 +1,6 @@
 import { ashgrove } from './case/ashgrove';
 import GameHeader from './components/GameHeader';
+import GuideDialog from './components/GuideDialog';
 import Toasts from './components/Toasts';
 import { GameProvider, useGame } from './game/GameContext';
 import { formatSavedAt } from './game/save';
@@ -17,13 +18,20 @@ export default function App() {
   return (
     <GameProvider data={ashgrove}>
       <Screens />
+      <Guide />
       <Toasts />
     </GameProvider>
   );
 }
 
+/** The optional guide overlays whatever screen is open, leaving it untouched. */
+function Guide() {
+  const { guideOpen, closeGuide } = useGame();
+  return guideOpen ? <GuideDialog onClose={closeGuide} /> : null;
+}
+
 function Screens() {
-  const { data, view, go, saveInfo, canContinue, continueSolved, continueGame, startNewGame } = useGame();
+  const { data, view, go, saveInfo, canContinue, continueSolved, continueGame, startNewGame, openGuide } = useGame();
 
   switch (view.name) {
     case 'title':
@@ -34,6 +42,7 @@ function Screens() {
           unreadableSave={saveInfo.status === 'unreadable'}
           onContinue={continueGame}
           onNewGame={startNewGame}
+          onHowToPlay={openGuide}
         />
       );
     case 'intro':

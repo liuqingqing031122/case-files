@@ -1,0 +1,114 @@
+/* The guide: the same paper panel as the evidence card, with a scrolling body. */
+.guide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(660px, 100%);
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(90, 120, 160, 0.1) 31px 32px),
+    var(--paper);
+  color: var(--ink);
+  border-radius: 2px;
+  box-shadow: var(--shadow-paper);
+  animation: card-in 300ms cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+.guide:focus {
+  outline: none;
+}
+
+.guide-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 26px 30px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.guide-kicker {
+  margin: 0;
+  font-family: var(--font-type);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.guide-title {
+  margin: 4px 50px 18px 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.45rem, 5vw, 1.9rem);
+}
+
+.guide-section {
+  margin-bottom: 18px;
+}
+
+.guide-heading {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+}
+
+.guide-text,
+.guide-points,
+.guide-note {
+  margin: 0 0 8px;
+  font-family: var(--font-type);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.guide-points {
+  padding-left: 1.2em;
+}
+
+.guide-points li {
+  margin-bottom: 6px;
+}
+
+.guide-points strong,
+.guide-note strong {
+  color: var(--oxblood);
+  font-weight: 700;
+}
+
+.guide-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--oxblood);
+  background: rgba(139, 30, 30, 0.06);
+}
+
+.guide-tips {
+  padding-top: 14px;
+  border-top: 1px dashed rgba(42, 36, 32, 0.3);
+}
+
+.guide-tips-status {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  color: var(--oxblood);
+}
+
+@media (max-width: 640px) {
+  .guide-scroll {
+    padding: 22px 18px 10px;
+  }
+
+  .guide-text,
+  .guide-points,
+  .guide-note {
+    font-size: 0.92rem;
+  }
+
+  .guide .evidence-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import EvidenceArt from '../components/EvidenceArt';
 import EvidenceCard from '../components/EvidenceCard';
+import DetectivesNote from '../components/DetectivesNote';
 import { useGame } from '../game/GameContext';
+import { useNotes } from '../game/useNotes';
 import { EVIDENCE_ART } from '../game/uiContent';
 import './CaseFileScreen.css';
 
@@ -9,6 +11,8 @@ export default function CaseFileScreen() {
   const { data, state } = useGame();
   const [filter, setFilter] = useState<'all' | 'item' | 'testimony'>('all');
   const [viewing, setViewing] = useState<string | null>(null);
+  const notes = useNotes(['casefile']);
+  const focusFirstCard = () => document.querySelector<HTMLElement>('.casefile-card')?.focus();
 
   const cards = state.evidence.map((id) => data.evidence[id]).filter((c) => filter === 'all' || c.kind === filter);
 
@@ -16,6 +20,21 @@ export default function CaseFileScreen() {
     <main className="page">
       <p className="page-kicker">Everything you have gathered</p>
       <h1 className="page-title">Case File</h1>
+      <p className="page-intro">Everything you find is kept here, so you never need to memorise a clue.</p>
+
+      {notes.next && (
+        <DetectivesNote
+          id={notes.next}
+          onGotIt={(kb) => {
+            notes.dismiss('casefile');
+            if (kb) focusFirstCard();
+          }}
+          onSkip={(kb) => {
+            notes.skip();
+            if (kb) focusFirstCard();
+          }}
+        />
+      )}
 
       <div className="casefile-filters" role="group" aria-label="Filter cards">
         {(['all', 'item', 'testimony'] as const).map((f) => (
@@ -28,7 +47,7 @@ export default function CaseFileScreen() {
       {cards.length === 0 ? (
         <p className="page-intro">Nothing here yet.</p>
       ) : (
-        <ul className="casefile-grid">
+        <ul className={`casefile-grid${notes.next === 'casefile' ? ' is-coached' : ''}`}>
           {cards.map((card) => {
             const art = EVIDENCE_ART[card.id];
             return (

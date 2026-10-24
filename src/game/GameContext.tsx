@@ -23,6 +23,7 @@ import {
 } from '../engine';
 import { newlyRevealedHotspots, revealMessage } from './announcements';
 import { createSaveController, getStorage, hasProgress, resumeView, type SaveController, type SaveInfo } from './save';
+import { markSeen, readTips, showAgain, skipAll, writeTips, type NoteId, type TipsState } from './tips';
 import { isResumeView, type ResumeView, type View } from './view';
 
 export type { View } from './view';
@@ -48,6 +49,18 @@ interface GameApi {
   /** Whether the player has opened Gale's hints yet (drives a gentle highlight). */
   galeOpened: boolean;
   markGaleOpened: () => void;
+  /** Detective's Notes progress (its own storage key; never in the game save). */
+  tips: TipsState;
+  markTipSeen: (id: NoteId) => void;
+  skipTips: () => void;
+  showTipsAgain: () => void;
+  /** A header control currently highlighted by a note. */
+  coachTarget: 'gale' | null;
+  setCoachTarget: (target: 'gale' | null) => void;
+  /** The optional Detective's Guide overlay (UI only; never saved). */
+  guideOpen: boolean;
+  openGuide: () => void;
+  closeGuide: () => void;
   /** What the title screen should offer. */
   saveInfo: SaveInfo;
   /** True when a game can be continued (this session's, or a stored one). */
@@ -75,6 +88,7 @@ export function GameProvider({ data, children, storage }: ProviderProps) {
     controllerRef.current = createSaveController(data, storage === undefined ? getStorage() : storage);
   }
   const controller = controllerRef.current;
+  const storageRef = useRef<Storage | null>(storage === undefined ? getStorage() : storage);
 
   const [state, setState] = useState(() => initialState(data));
   const stateRef = useRef(state);
@@ -83,6 +97,23 @@ export function GameProvider({ data, children, storage }: ProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [hintTiers, setHintTiers] = useState<Record<string, number>>({});
   const [galeOpened, setGaleOpened] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [tips, setTips] = useState<TipsState>(() => readTips(storageRef.current));
+  const [coachTarget, setCoachTarget] = useState<'gale' | null>(null);
+  const tipsLoaded = useRef(false);
+  // Persist tip progress whenever it changes (not on the initial load).
+  useEffect(() => {
+    if (!tipsLoaded.current) {
+      tipsLoaded.current = true;
+      return;
+    }
+    writeTips(storageRef.current, tips);
+  }, [tips]);
+  const markTipSeen = useCallback((id: NoteId) => setTips((t) => markSeen(t, id)), []);
+  const skipTips = useCallback(() => setTips(skipAll), []);
+  const showTipsAgain = useCallback(() => setTips(showAgain()), []);
+  const openGuide = useCallback(() => setGuideOpen(true), []);
+  const closeGuide = useCallback(() => setGuideOpen(false), []);
   const [saveInfo, setSaveInfo] = useState<SaveInfo>(() => controller.info());
   const [active, setActive] = useState(false);
   const nextToastId = useRef(1);
@@ -187,13 +218,22 @@ export function GameProvider({ data, children, storage }: ProviderProps) {
         setHintTiers((prev) => ({ ...prev, [hintId]: (prev[hintId] ?? 1) + 1 })),
       galeOpened,
       markGaleOpened: () => setGaleOpened(true),
+      tips,
+      markTipSeen,
+      skipTips,
+      showTipsAgain,
+      coachTarget,
+      setCoachTarget,
+      guideOpen,
+      openGuide,
+      closeGuide,
       saveInfo,
       canContinue,
       continueSolved,
       continueGame,
       startNewGame,
     }),
-    [data, state, act, view, go, toasts, hintTiers, galeOpened, saveInfo, canContinue, continueSolved, continueGame, startNewGame],
+    [data, state, act, view, go, toasts, hintTiers, galeOpened, tips, markTipSeen, skipTips, showTipsAgain, coachTarget, guideOpen, openGuide, closeGuide, saveInfo, canContinue, continueSolved, continueGame, startNewGame],
   );
 
   return <GameContext.Provider value={api}>{children}</GameContext.Provider>;

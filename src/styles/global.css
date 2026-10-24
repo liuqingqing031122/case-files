@@ -53,6 +53,8 @@ button {
     .evidence-card,
     .picker,
     .confirm-dialog,
+    .guide,
+    .detectives-note,
     .statement-list,
     [role='tabpanel'],
     .accuse-slots,
@@ -242,6 +244,28 @@ button {
   font-family: var(--font-type);
   font-size: 0.85rem;
   color: var(--oxblood);
+}
+
+/* A Detective's Note points at a real control. Outline only: the control
+   stays fully usable. Yellow on the dark desk, oxblood on paper. */
+.is-coached {
+  outline: 3px solid #f4e9a8;
+  outline-offset: 4px;
+  animation: coach-pulse 1.8s ease-in-out infinite;
+}
+
+:where(.statement-list, [role='tabpanel'], .accuse-slots) .is-coached {
+  outline-color: var(--oxblood);
+}
+
+@keyframes coach-pulse {
+  0%,
+  100% {
+    outline-offset: 4px;
+  }
+  50% {
+    outline-offset: 7px;
+  }
 }
 
 .visually-hidden {

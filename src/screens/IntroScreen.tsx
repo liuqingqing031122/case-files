@@ -31,7 +31,7 @@ export default function IntroScreen({ paragraphs, onContinue, onBack }: Props) {
           <p className="memo-sign">— R.G.</p>
           <p className="memo-ps">
             P.S. I'll be on hand throughout. If you get stuck, press <strong>Ask Gale</strong> at the top of the
-            screen and I'll suggest where to look next.
+            screen and I'll suggest where to look next. You'll also find <strong>How to Play</strong> there.
           </p>
           <section className="memo-rating" aria-labelledby="memo-rating-title">
             <p id="memo-rating-title" className="memo-rating-title">
